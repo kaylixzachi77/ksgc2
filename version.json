@@ -1,0 +1,9 @@
+{
+  "version": "1.2",
+  "notes": "Added PIN requirement and live broadcasts.",
+  "pin": "1234", 
+  "files": {
+    "Home": "home.html",
+    "Tools": "tools.html"
+  }
+}
