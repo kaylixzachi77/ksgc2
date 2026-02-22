@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GCEC Shell - PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  /* --- THEME VARIABLES --- */
+  :root {
+    /* PINK THEME (Default) */
+    --bg-main: #1a252f;
+    --bg-menu: #2c3e50;
+    --text-main: #ffffff;
+    --text-muted: #bdc3c7;
+    --accent-1: #d63384;
+    --accent-2: #c02b76;
+    --danger-1: #e74c3c;
+    --danger-2: #c0392b;
+    --warning-1: #f39c12;
+    --warning-2: #d35400;
+    --border: #4a6278;
+    --popup-overlay: rgba(0,0,0,0.85);
+    --btn-text: #ffffff;
+    --input-bg: #1a252f;
+  }
+
+  [data-theme="dark"] {
+    --bg-main: #0d1117;
+    --bg-menu: #161b22;
+    --text-main: #c9d1d9;
+    --text-muted: #8b949e;
+    --accent-1: #58a6ff;
+    --accent-2: #1f6feb;
+    --danger-1: #da3633;
+    --danger-2: #b3261e;
+    --warning-1: #d29922;
+    --warning-2: #9e6a03;
+    --border: #30363d;
+    --popup-overlay: rgba(0,0,0,0.9);
+    --btn-text: #ffffff;
+    --input-bg: #0d1117;
+  }
+
+  [data-theme="light"] {
+    --bg-main: #f6f8fa;
+    --bg-menu: #ffffff;
+    --text-main: #24292f;
+    --text-muted: #57606a;
+    --accent-1: #0969da;
+    --accent-2: #0550ae;
+    --danger-1: #cf222e;
+    --danger-2: #a40e26;
+    --warning-1: #bf8700;
+    --warning-2: #9e6a03;
+    --border: #d0d7de;
+    --popup-overlay: rgba(0,0,0,0.5);
+    --btn-text: #ffffff;
+    --input-bg: #ffffff;
+  }
+
+  /* --- GLOBAL STYLES --- */
+  html, body {
+    margin: 0; padding: 0; height: 100%; overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: var(--bg-main); 
+    color: var(--text-main);
+    transition: background 0.3s, color 0.3s;
+    display: flex; flex-direction: column; 
+  }
+  iframe { width: 100%; flex-grow: 1; border: none; background: #fff; }
+
+  /* --- NOTIFICATION BANNER (Marquee) --- */
+  #marquee-container {
+    display: none; 
+    width: 100%;
+    background: var(--accent-1);
+    color: var(--btn-text);
+    font-weight: bold;
+    font-size: 13px;
+    padding: 8px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 9000;
+  }
+  .marquee-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 15s linear infinite;
+  }
+  @keyframes marquee {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(-100%, 0); }
+  }
+
+  /* Toggle Button */
+  #toggle {
+    position: fixed; right: 0; top: 50%;
+    transform: translateY(-50%);
+    background: var(--accent-1); color: var(--btn-text); 
+    padding: 12px 10px; font-weight: bold;
+    border-radius: 14px 0 0 14px; cursor: pointer; z-index: 10001;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+    transition: 0.2s;
+  }
+  #toggle:hover { background: var(--accent-2); }
+
+  /* Side Menu */
+  #menu {
+    position: fixed; right: -240px; top: 0; width: 220px; height: 100%;
+    background: var(--bg-menu); color: var(--text-main);
+    display: flex; flex-direction: column;
+    align-items: center; gap: 8px; padding: 15px 10px;
+    transition: .3s; z-index: 10000;
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+  }
+  #menu.show { right: 0; }
+
+  /* Overlay */
+  #overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    display: none; z-index: 9999;
+  }
+
+  /* Popups */
+  .modal-wrapper {
+    position: fixed; inset: 0; background: var(--popup-overlay);
+    display: none; flex-direction: column; align-items: center;
+    justify-content: center; z-index: 20000; padding: 20px;
+    text-align: center;
+  }
+  .popup-content {
+    background: var(--bg-menu); padding: 25px; border-radius: 12px;
+    border: 2px solid var(--accent-1); max-width: 320px; width: 90%;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    color: var(--text-main);
+  }
+
+  .new-tag { 
+    color: var(--accent-1); font-weight: 900; margin-bottom: 5px; 
+    display: block; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  input[type="text"], textarea {
+    width: 100%; padding: 12px; margin-bottom: 15px; box-sizing: border-box;
+    border-radius: 8px; border: 1px solid var(--border); background: var(--input-bg);
+    color: var(--text-main); font-size: 14px; transition: 0.2s;
+  }
+  input[type="text"]:focus, textarea:focus { 
+    outline: 1px solid var(--accent-1); border-color: var(--accent-1); 
+  }
+  
+  /* Buttons */
+  button {
+    width: 100%; padding: 12px 0; border: none; border-radius: 6px;
+    background: linear-gradient(135deg, var(--accent-1) 0%, var(--accent-2) 100%); 
+    color: var(--btn-text); font-weight: bold; cursor: pointer;
+    transition: .2s; text-align: center; letter-spacing: 0.5px;
+  }
+  button:hover { opacity: 0.9; transform: scale(0.98); }
+  button:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .version { font-size: 12px; color: var(--text-main); text-align: center; margin: 5px 0; background: var(--border); padding: 4px 10px; border-radius: 12px; }
+  .notes { font-size: 11px; color: var(--text-muted); text-align: center; margin-bottom: 10px; max-height: 60px; overflow-y: auto; }
+  
+  /* File List Styling */
+  .file-list-container { width: 100%; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; padding-right: 5px; max-height: 25vh;}
+  
+  button.official-btn { background: var(--border); border: 1px solid var(--border); color: var(--text-main); text-align: left; padding-left: 12px; }
+  button.official-btn:hover { background: var(--accent-1); border-color: var(--accent-1); color: var(--btn-text); }
+
+  button.file-btn { background: var(--bg-main); border: 1px solid var(--border); color: var(--text-main); text-align: left; padding-left: 12px; }
+  button.file-btn:hover { background: var(--accent-1); border-color: var(--accent-1); color: var(--btn-text); }
+  
+  /* Theme Switcher Buttons */
+  .theme-btn { padding: 8px 0; font-size: 10px; border-radius: 4px; border: 1px solid var(--border); }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-main); }
+  ::-webkit-scrollbar-thumb { background: var(--accent-1); border-radius: 4px; }
+
+</style>
+</head>
+<body>
+
+<div id="marquee-container">
+  <span class="marquee-text" id="marquee-text"></span>
+</div>
+
+<div id="updatePopup" class="modal-wrapper">
+  <div class="popup-content">
+    <span class="new-tag">New update found!</span>
+    <h2 style="margin:5px 0 15px 0">Please Update</h2>
+    <div style="text-align: left; background: var(--bg-main); padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 3px solid var(--accent-1);">
+      <b style="color: var(--accent-1); font-size: 13px; text-transform: uppercase;">What's new:</b>
+      <div id="popupNotes" style="font-size: 13px; margin-top: 5px; line-height: 1.4;"></div>
+    </div>
+    <button id="btnConfirmUpdate" onclick="startUpdate()">UPDATE NOW</button>
+  </div>
+</div>
+
+<div id="managePopup" class="modal-wrapper" style="z-index: 25000;">
+  <div class="popup-content" style="max-width: 320px;">
+    <h3 style="margin-top:0; color:var(--accent-1); text-transform: uppercase;">Manage Local Files</h3>
+    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Select a file to Edit or Delete</p>
+    
+    <div id="manageFileList" style="display:flex; flex-direction:column; gap:5px; max-height:200px; overflow-y:auto; margin-bottom: 15px;"></div>
+    
+    <button onclick="resetLocalFiles()" style="background: var(--danger-1); margin-bottom:10px;">RESET ALL LOCAL FILES</button>
+    <button onclick="closeManageLocal()" style="background: var(--border); color:var(--text-main);">CLOSE</button>
+  </div>
+</div>
+
+<div id="addFilePopup" class="modal-wrapper" style="z-index: 26000;">
+  <div class="popup-content" style="max-width: 400px;">
+    <h3 id="modalTitle" style="margin-top:0; color:var(--accent-1); text-transform: uppercase;">Add Local File</h3>
+    <input type="text" id="localFileName" placeholder="Enter File Name (e.g. My Calc)">
+    <textarea id="localFileCode" placeholder="Paste full HTML code here..." style="height: 180px; resize: none; font-family: monospace; font-size: 10px;"></textarea>
+    
+    <div style="display:flex; gap:8px;">
+      <button onclick="saveLocalFile()" style="background: #27ae60; color: #fff;">SAVE</button>
+      <button id="btnDeleteLocal" onclick="deleteLocalFileFromEdit()" style="background: var(--danger-1); color: #fff; display:none;">DELETE</button>
+      <button onclick="closeAddFile()" style="background: var(--border); color: var(--text-main);">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<div id="overlay" onclick="toggleMenu()"></div>
+
+<iframe id="frame"></iframe>
+
+<div id="toggle" onclick="toggleMenu()">❮</div>
+
+<div id="menu">
+  <button id="btnUpdate" onclick="manualCheck()" style="margin-bottom: 5px;">CHECK UPDATE</button>
+  <div class="version">Version: <span id="ver">—</span></div>
+  <div class="notes" id="notes">No notes available.</div>
+
+  <div style="display:flex; gap:5px; width:100%; margin-top: 5px;">
+    <button class="theme-btn" onclick="setTheme('pink')" style="background:#d63384; color:#fff; border:none;">PINK</button>
+    <button class="theme-btn" onclick="setTheme('dark')" style="background:#161b22; color:#c9d1d9;">DARK</button>
+    <button class="theme-btn" onclick="setTheme('light')" style="background:#ffffff; color:#24292f;">LIGHT</button>
+  </div>
+
+  <b style="margin-top: 10px; border-top: 1px solid var(--border); width: 100%; text-align: center; padding-top: 10px; color: var(--text-muted); font-size: 11px; letter-spacing: 1px;">OFFICIAL FILES</b>
+  <div id="officialFileButtons" class="file-list-container"></div>
+
+  <b style="margin-top: 5px; border-top: 1px solid var(--border); width: 100%; text-align: center; padding-top: 10px; color: var(--text-muted); font-size: 11px; letter-spacing: 1px;">LOCAL FILES</b>
+  <div id="localFileButtons" class="file-list-container"></div>
+
+  <div style="width:100%; display:flex; gap:5px; margin-top: 10px;">
+    <button style="background:#27ae60; color:#fff; font-size:11px; padding: 8px 0;" onclick="openAddFile()">+ Add Local</button>
+    <button style="background:var(--accent-1); color:#fff; font-size:11px; padding: 8px 0;" onclick="openManageLocal()">Manage Local</button>
+  </div>
+
+  <button style="margin-top: auto; background: var(--bg-main); border: 1px solid var(--border); color: var(--text-muted);" onclick="showAbout()">About this app</button>
+</div>
+
+<script>
+// --- CONFIG ---
+const BASE = "https://kaylixzachi77.github.io/ksgc2/";
+const VERSION_URL = BASE + "version.json";
+const BROADCAST_URL = BASE + "broadcast.json";
+
+// --- STORAGE KEYS ---
+const SERVER_STORE = 'gcec_server_files'; 
+const LOCAL_STORE = 'gcec_local_files';   
+const VER = 'gcec_ver';
+const NOTES = 'gcec_notes';
+const ABOUT = 'gcec_about'; 
+const BROADCAST_MSG = 'gcec_broadcast_msg';
+const BROADCAST_ACTIVE = 'gcec_broadcast_active';
+const THEME_KEY = 'gcec_theme';
+
+// --- DOM ELEMENTS ---
+const frame = document.getElementById("frame");
+const verText = document.getElementById("ver");
+const notesText = document.getElementById("notes");
+const btnUpdate = document.getElementById("btnUpdate");
+const menu = document.getElementById("menu");
+const overlay = document.getElementById("overlay");
+const toggleBtn = document.getElementById("toggle");
+
+const officialFileButtons = document.getElementById("officialFileButtons");
+const localFileButtons = document.getElementById("localFileButtons");
+const manageFileList = document.getElementById("manageFileList");
+
+const updatePopup = document.getElementById("updatePopup");
+const popupNotes = document.getElementById("popupNotes");
+const managePopup = document.getElementById("managePopup");
+const addFilePopup = document.getElementById("addFilePopup");
+const modalTitle = document.getElementById("modalTitle");
+const btnDeleteLocal = document.getElementById("btnDeleteLocal");
+
+const marqueeContainer = document.getElementById("marquee-container");
+const marqueeText = document.getElementById("marquee-text");
+
+let pendingUpdateData = null;
+let isManualCheck = false;
+let editingFileName = null; 
+
+// --- THEME LOGIC ---
+function setTheme(themeName) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem(THEME_KEY, themeName);
+}
+
+function loadTheme() {
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'pink';
+  setTheme(savedTheme);
+}
+
+// --- CORE FUNCTIONS ---
+function toggleMenu(){
+  const open = menu.classList.toggle("show");
+  overlay.style.display = open ? "block" : "none";
+  toggleBtn.textContent = open ? "❯" : "❮";
+}
+
+function loadOffline(){
+  const serverFiles = JSON.parse(localStorage.getItem(SERVER_STORE) || '{}');
+  const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+  
+  const version = localStorage.getItem(VER) || 'No Version';
+  const notes = localStorage.getItem(NOTES) || 'Update notes will appear here';
+  
+  verText.textContent = version;
+  notesText.textContent = notes;
+
+  const serverKeys = Object.keys(serverFiles);
+  const localKeys = Object.keys(localFiles);
+
+  // Load first available file if empty
+  if(frame.srcdoc === "" || frame.srcdoc.includes("No offline data found")) {
+      if (serverKeys.length > 0) {
+          frame.srcdoc = serverFiles[serverKeys[0]];
+      } else if (localKeys.length > 0) {
+          frame.srcdoc = localFiles[localKeys[0]];
+      } else {
+          frame.srcdoc = `
+          <div style="text-align:center; padding-top:100px; font-family:'Segoe UI', sans-serif;">
+            <h2 style="color: var(--accent-1);">GCEC Shell</h2>
+            <p style="color: var(--text-main);">No offline data found.</p>
+            <p style="color: var(--text-muted); font-size: 14px;">Click "CHECK UPDATE" or Add a Local File.</p>
+          </div>`;
+      }
+  }
+
+  // Render Official Files
+  officialFileButtons.innerHTML = '';
+  if (serverKeys.length === 0) {
+      officialFileButtons.innerHTML = '<div style="color:var(--text-muted); font-size:10px; text-align:center;">No official files. Update required.</div>';
+  } else {
+      serverKeys.forEach(k => {
+        const btnFile = document.createElement('button');
+        btnFile.className = "official-btn";
+        btnFile.style.width = "100%";
+        btnFile.textContent = k;
+        btnFile.onclick = () => { frame.srcdoc = serverFiles[k]; toggleMenu(); };
+        officialFileButtons.appendChild(btnFile);
+      });
+  }
+
+  // Render Local Files (Clean list, no side buttons)
+  localFileButtons.innerHTML = '';
+  if (localKeys.length === 0) {
+      localFileButtons.innerHTML = '<div style="color:var(--text-muted); font-size:10px; text-align:center;">No local files added yet.</div>';
+  } else {
+      localKeys.forEach(k => {
+        const btnFile = document.createElement('button');
+        btnFile.className = "file-btn";
+        btnFile.style.width = "100%";
+        btnFile.textContent = k;
+        btnFile.onclick = () => { frame.srcdoc = localFiles[k]; toggleMenu(); };
+        localFileButtons.appendChild(btnFile);
+      });
+  }
+}
+
+// --- LOCAL FILE MANAGEMENT ---
+function openManageLocal() {
+    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    const localKeys = Object.keys(localFiles);
+    
+    manageFileList.innerHTML = '';
+    
+    if (localKeys.length === 0) {
+        manageFileList.innerHTML = '<div style="color:var(--text-muted); font-size:12px;">No local files to manage.</div>';
+    } else {
+        localKeys.forEach(k => {
+            const btn = document.createElement('button');
+            btn.textContent = k + " ✎";
+            btn.style.background = "var(--bg-main)";
+            btn.style.border = "1px solid var(--border)";
+            btn.style.color = "var(--text-main)";
+            btn.onclick = () => {
+                closeManageLocal();
+                editLocalFile(k);
+            };
+            manageFileList.appendChild(btn);
+        });
+    }
+    
+    managePopup.style.display = "flex";
+    toggleMenu();
+}
+
+function closeManageLocal() {
+    managePopup.style.display = "none";
+}
+
+function openAddFile() {
+    editingFileName = null;
+    modalTitle.textContent = "Add Local File";
+    document.getElementById("localFileName").value = "";
+    document.getElementById("localFileCode").value = "";
+    btnDeleteLocal.style.display = "none"; // Hide delete button on Add
+    addFilePopup.style.display = "flex";
+    toggleMenu(); 
+}
+
+function editLocalFile(filename) {
+    editingFileName = filename;
+    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    
+    modalTitle.textContent = "Edit Local File";
+    document.getElementById("localFileName").value = filename;
+    document.getElementById("localFileCode").value = localFiles[filename];
+    
+    btnDeleteLocal.style.display = "block"; // Show delete button on Edit
+    addFilePopup.style.display = "flex";
+}
+
+function closeAddFile() {
+    addFilePopup.style.display = "none";
+}
+
+function saveLocalFile() {
+    const name = document.getElementById("localFileName").value.trim();
+    const code = document.getElementById("localFileCode").value;
+    
+    if(!name) return alert("Please enter a file name.");
+    if(!code) return alert("Please paste the HTML code.");
+
+    const serverFiles = JSON.parse(localStorage.getItem(SERVER_STORE) || '{}');
+    if(serverFiles[name]) return alert("Error: You cannot use the same name as an Official File.");
+
+    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    
+    if(editingFileName && editingFileName !== name) {
+        if(localFiles[name]) {
+            if(!confirm("A local file named '" + name + "' already exists. Overwrite it?")) return;
+        }
+        delete localFiles[editingFileName]; 
+    } else if (!editingFileName && localFiles[name]) {
+        if(!confirm("A local file named '" + name + "' already exists. Overwrite it?")) return;
+    }
+
+    localFiles[name] = code;
+    localStorage.setItem(LOCAL_STORE, JSON.stringify(localFiles));
+    
+    closeAddFile();
+    alert(name + " saved successfully!");
+    
+    frame.srcdoc = code;
+    loadOffline();
+}
+
+function deleteLocalFileFromEdit() {
+    if(!editingFileName) return;
+    if(!confirm("Are you sure you want to permanently delete '" + editingFileName + "'?")) return;
+    
+    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    delete localFiles[editingFileName];
+    localStorage.setItem(LOCAL_STORE, JSON.stringify(localFiles));
+    
+    closeAddFile();
+    frame.srcdoc = ""; 
+    loadOffline();
+    openManageLocal(); // Reopen manage screen to see updated list
+}
+
+function resetLocalFiles() {
+    if(!confirm("WARNING: This will permanently DELETE ALL your custom local files. Continue?")) return;
+
+    localStorage.removeItem(LOCAL_STORE);
+    closeManageLocal();
+    frame.srcdoc = ""; 
+    loadOffline();
+    alert("All local files have been cleared.");
+}
+
+// --- UPDATE LOGIC ---
+async function checkUpdateLogic() {
+  try {
+    const r = await fetch(VERSION_URL + "?t=" + new Date().getTime(), {cache:'no-store'});
+    if(!r.ok) throw "Server error";
+    const vData = await r.json();
+    
+    const localVer = localStorage.getItem(VER);
+
+    if(vData.version !== localVer) {
+      pendingUpdateData = vData;
+      popupNotes.textContent = vData.notes || "Bug fixes and improvements.";
+      updatePopup.style.display = "flex";
+    } else {
+      if(isManualCheck) alert("You are using the latest version (" + localVer + ").");
+    }
+  } catch(e) {
+    if(isManualCheck) alert("No internet connection or server unavailable.");
+  } finally {
+    isManualCheck = false;
+    btnUpdate.disabled = false;
+    btnUpdate.textContent = "CHECK UPDATE";
+  }
+}
+
+function manualCheck() {
+  isManualCheck = true;
+  btnUpdate.disabled = true;
+  btnUpdate.textContent = "Checking...";
+  checkUpdateLogic();
+}
+
+async function startUpdate(){
+  if(!pendingUpdateData) return;
+  
+  const btn = document.getElementById("btnConfirmUpdate");
+  btn.disabled = true;
+  btn.textContent = "Downloading...";
+
+  try {
+    const files = {};
+    const downloadFiles = pendingUpdateData.files;
+
+    for(const key in downloadFiles){
+      const url = BASE + downloadFiles[key] + "?t=" + new Date().getTime();
+      const res = await fetch(url);
+      if(!res.ok) throw `File not found: ${downloadFiles[key]}`;
+      files[key] = await res.text();
+    }
+
+    localStorage.setItem(SERVER_STORE, JSON.stringify(files));
+    localStorage.setItem(VER, pendingUpdateData.version);
+    localStorage.setItem(NOTES, pendingUpdateData.notes || '');
+    
+    const fallbackAbout = "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon";
+    localStorage.setItem(ABOUT, pendingUpdateData.about || fallbackAbout);
+
+    alert("Official Files updated successfully! App will now refresh.");
+    location.reload();
+
+  } catch(e) {
+    console.error(e);
+    alert("Update failed: " + e);
+    btn.disabled = false;
+    btn.textContent = "RETRY UPDATE";
+  }
+}
+
+// --- BROADCAST BANNER LOGIC ---
+function applySavedBroadcast() {
+    const isActive = localStorage.getItem(BROADCAST_ACTIVE) === 'true';
+    const msg = localStorage.getItem(BROADCAST_MSG);
+
+    if (isActive && msg) {
+        marqueeText.textContent = msg;
+        marqueeContainer.style.display = "block";
+    } else {
+        marqueeContainer.style.display = "none";
+    }
+}
+
+async function checkBroadcast() {
+  try {
+    const r = await fetch(BROADCAST_URL + "?t=" + new Date().getTime(), {cache:'no-store'});
+    if(!r.ok) return;
+    const bData = await r.json();
+    
+    if (bData.active) {
+        localStorage.setItem(BROADCAST_ACTIVE, 'true');
+        localStorage.setItem(BROADCAST_MSG, bData.message);
+    } else {
+        localStorage.setItem(BROADCAST_ACTIVE, 'false');
+        localStorage.setItem(BROADCAST_MSG, "");
+    }
+    
+    applySavedBroadcast(); 
+    
+  } catch(e) {
+  }
+}
+
+function showAbout(){
+  const defaultAbout = "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon";
+  const dynamicAbout = localStorage.getItem(ABOUT) || defaultAbout;
+  const currentVer = localStorage.getItem(VER) || 'Offline';
+  
+  alert(dynamicAbout + "\n\nVersion: " + currentVer);
+}
+
+// Initialize
+window.onload = () => {
+  loadTheme();
+  applySavedBroadcast(); 
+  loadOffline();
+  checkUpdateLogic(); 
+  checkBroadcast(); 
+};
+</script>
+
+</body>
+</html>
