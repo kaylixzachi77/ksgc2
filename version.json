@@ -1,6 +1,6 @@
 {
-  "version": "1.3",
-  "notes": "Updated app to include only the Grade Calculator.",
+  "version": "1.4",
+  "notes": " ADDED NEW FEATURES AND DESIGN.",
   "about": "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon",
   "files": {
     "GRADE": "grade.html"
