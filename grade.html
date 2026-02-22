@@ -1,1 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KSGC Grade Calculator - PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; color: #333; }
+    
+    /* --- Header Bar --- */
+    .header-bar {
+        display: flex; justify-content: center; align-items: center;
+        background: #2c3e50; padding: 12px; color: white;
+        position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .header-bar h2 { margin: 0; font-size: 1.1rem; letter-spacing: 1px; }
+
+    /* --- Controls & Table --- */
+    #controls { 
+        display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; align-items: center;
+        margin: 6px; padding: 8px; background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    }
+
+    button { padding: 6px 10px; font-size: 11px; cursor: pointer; background: #fff; border: 1px solid #999; border-radius: 4px; font-weight: bold; }
+    button:active { background: #eee; transform: scale(0.98); }
+    select, input[type=text] { padding: 4px 6px; font-size: 11px; border-radius: 4px; border: 1px solid #ccc; }
+
+    /* Slider styling for aesthetic */
+    .slider-container {
+        display: flex; align-items: center; gap: 5px; 
+        background: #fadbd8; border: 1px solid #e74c3c; 
+        padding: 4px 8px; border-radius: 4px;
+    }
+    .slider-container label { font-size: 10px; font-weight: bold; color: #c0392b; }
+    input[type=range] { width: 70px; cursor: pointer; }
+
+    .table-container { overflow-x: auto; background: #fff; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin: 0 6px 15px 6px; }
+    
+    table { width: 100%; border-collapse: collapse; font-size: 11px; min-width: 650px; }
+    
+    th, td { border: 1px solid #ccc; padding: 2px; text-align: center; height: 26px; }
+    
+    /* Buong main header row ginawang Pink! */
+    th.main-header { background: #d63384; color: white; font-size: 10px; white-space: nowrap; }
+    
+    th.name-header {
+        font-weight: 900;
+        text-align: center !important;
+        letter-spacing: 1px;
+    }
+    
+    /* Pink headers for Activities */
+    th.act-header { cursor: pointer; transition: 0.2s; }
+    th.act-header:hover { background: #c02b76 !important; }
+    th.act-header.delete-mode { background: #c0392b !important; color: white !important; }
+    th.act-header.delete-mode:hover { background: #e74c3c !important; }
+
+    input { width: 100%; box-sizing: border-box; text-align: center; border: none; background: transparent; padding: 2px 0; font-size: 11px; }
+    
+    /* Buong column ng Student Name ay pink na */
+    td.name-cell { background-color: #fdedec; text-align: left; padding: 0; }
+    
+    /* Fixed strict left-alignment para sa slider */
+    input.name { 
+        text-align: left !important; 
+        padding-left: 8px !important; 
+        font-weight: bold; 
+        width: 100%; 
+        height: 100%;
+        outline: none;
+    }
+
+    .final { font-weight: bold; font-size: 12px; }
+    .high { color: #27ae60; }
+    .low { color: #e74c3c; }
+    
+    /* Number column soft pink */
+    .row-num { font-weight: bold; color: #c0392b; background-color: #fdedec; width: 25px; padding: 0; }
+    
+    .del-btn { color: white; background: #e74c3c; border: none; font-size: 10px; cursor: pointer; padding: 3px 6px; border-radius: 3px; width: 100%; height: 100%; }
+    .del-btn:hover { background: #c0392b; }
+
+    .history-btn { background: #f39c12; color: white; border: none; }
+    .action-btn { background: #3498db; color: white; border: none; }
+    .danger-btn { background: #c0392b; color: white; border: none; }
+    .data-btn { background: #8e44ad; color: white; border: none; }
+    .clear-btn { background: #e67e22; color: white; border: none; }
+</style>
+
+<script>
+var subjects = JSON.parse(localStorage.getItem("subjects") || "[]");
+// Default is now strictly 3 activities starting at 0 score
+var maxScore = { quizzes: [0, 0, 0], exam: 0, attendance: 0, weights: { quizzes: 50, exam: 40, attendance: 10 } };
+var undoStack = [], redoStack = [];
+
+var isDeleteStudentMode = false;
+var isDeleteActMode = false;
+
+document.addEventListener('click', function(e) {
+    if (isDeleteStudentMode || isDeleteActMode) {
+        if (e.target.id === 'btnDelStudent' || e.target.id === 'btnDelAct') return;
+        if (e.target.classList.contains('del-btn') || e.target.classList.contains('act-header')) return;
+        
+        isDeleteStudentMode = false;
+        isDeleteActMode = false;
+        loadSubjectData(); 
+    }
+});
+
+function updateSubjectDropdown() {
+    var select = document.getElementById("subjectSelect");
+    if(!select) return;
+    select.innerHTML = '<option value="">--Select Subject--</option>';
+    subjects.forEach(function(s) {
+        var o = document.createElement("option");
+        o.value = s; o.textContent = s;
+        select.appendChild(o);
+    });
+}
+
+function createSubject() {
+    var name = prompt("Enter subject name:");
+    if (!name) return;
+    name = name.trim();
+    if (subjects.indexOf(name) > -1) return alert("Subject already exists!");
+    saveState();
+    subjects.push(name);
+    localStorage.setItem("subjects", JSON.stringify(subjects));
+    // Default of 3 activities for every new subject!
+    localStorage.setItem("max_" + name, JSON.stringify({ quizzes: [0, 0, 0], exam: 0, attendance: 0, weights: { quizzes: 50, exam: 40, attendance: 10 } }));
+    updateSubjectDropdown();
+    document.getElementById("subjectSelect").value = name;
+    loadSubjectData();
+}
+
+function loadSubjectData() {
+    var subj = document.getElementById("subjectSelect").value;
+    var tHead = document.getElementById("tableHead");
+    var tBody = document.getElementById("tableBody");
+    if (!subj) { tBody.innerHTML = ""; tHead.innerHTML = ""; return; }
+
+    calculateGrades(true); 
+    
+    var savedMax = JSON.parse(localStorage.getItem("max_" + subj));
+    maxScore = savedMax || { quizzes: [0, 0, 0], exam: 0, attendance: 0, weights: { quizzes: 50, exam: 40, attendance: 10 } };
+    if (!maxScore.weights) maxScore.weights = { quizzes: 50, exam: 40, attendance: 10 };
+
+    var qCount = maxScore.quizzes.length || 1;
+
+    // --- 1. Create Weights Row (Pink & Centered) ---
+    var wRow = '<tr class="weight-row" style="background:#fadbd8;">';
+    wRow += '<th style="background:#fdedec;"></th>'; 
+    wRow += '<th style="text-align:center; color:#c0392b; background:#fdedec;">WEIGHTS (%):</th>';
+    wRow += '<th colspan="'+qCount+'"><input type="number" id="weight_q" value="'+maxScore.weights.quizzes+'" title="Total Activity Weight" style="background:#fdedec; font-weight:bold; color:#c0392b; width: 45px; border:1px solid #e74c3c; border-radius:3px;"></th>';
+    wRow += '<th><input type="number" id="weight_e" value="'+maxScore.weights.exam+'" title="Exam Weight" style="background:#fdedec; font-weight:bold; color:#c0392b; width: 45px; border:1px solid #e74c3c; border-radius:3px;"></th>';
+    wRow += '<th><input type="number" id="weight_a" value="'+maxScore.weights.attendance+'" title="Attendance Weight" style="background:#fdedec; font-weight:bold; color:#c0392b; width: 45px; border:1px solid #e74c3c; border-radius:3px;"></th>';
+    wRow += '<th style="text-align:center;"><button onclick="applyWeights()" style="background:#e74c3c; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer;">Apply</button></th></tr>';
+
+    // --- 2. Create Max Score Row (Centered label) ---
+    var mRow = '<tr class="max-row" style="background:#fef9e7;">';
+    mRow += '<th style="background:#fdedec;"></th>'; 
+    mRow += '<th style="text-align:center; color:#d35400; background:#fdedec;">MAX SCORE:</th>';
+    maxScore.quizzes.forEach(function(q, i) { 
+        mRow += '<th><input type="number" value="'+q+'" onchange="saveMax('+i+',this.value)" style="background:#fff; border:1px solid #f39c12; font-weight:bold; color:#d35400; border-radius:3px;"></th>'; 
+    });
+    mRow += '<th><input type="number" value="'+maxScore.exam+'" onchange="saveMax(\'exam\',this.value)" style="background:#fff; border:1px solid #f39c12; font-weight:bold; color:#d35400; border-radius:3px;"></th>' +
+             '<th><input type="number" value="'+maxScore.attendance+'" onchange="saveMax(\'att\',this.value)" style="background:#fff; border:1px solid #f39c12; font-weight:bold; color:#d35400; border-radius:3px;"></th>' +
+             '<th>—</th></tr>';
+
+    // --- 3. Create Headers Row (All Pink now!) ---
+    var h = '<tr><th class="main-header" style="width:25px;">#</th><th class="main-header name-header">STUDENT NAMES</th>';
+    maxScore.quizzes.forEach(function(_, i) { 
+        if (isDeleteActMode) {
+            h += '<th class="main-header act-header delete-mode" style="width:45px;" onclick="deleteActivity('+i+', event)">✖ A'+(i+1)+'</th>';
+        } else {
+            h += '<th class="main-header act-header" style="width:45px;">A'+(i+1)+'</th>'; 
+        }
+    });
+    h += '<th class="main-header" style="width:50px;">Exam</th><th class="main-header" style="width:45px;">Att.</th><th class="main-header" style="width:55px;">Final</th></tr>';
+    
+    tHead.innerHTML = wRow + mRow + h;
+    tBody.innerHTML = ""; 
+
+    // --- 4. Load Students ---
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    data.forEach(function(s) { addRow(s, false); });
+    calculateGrades(false);
+
+    // Apply slider width (Default is now 150 which is right in the middle of min 50 and max 250)
+    var savedWidth = localStorage.getItem("nameWidth") || "150";
+    document.getElementById("nameWidthSlider").value = savedWidth;
+    adjustNameWidth(savedWidth);
+}
+
+function adjustNameWidth(val) {
+    var w = val + "px";
+    var header = document.querySelector(".name-header");
+    if(header) { 
+        header.style.width = w; 
+        header.style.minWidth = w; 
+    }
+    document.querySelectorAll(".name-cell").forEach(function(cell) {
+        cell.style.width = w; 
+        cell.style.minWidth = w;
+    });
+    localStorage.setItem("nameWidth", val);
+}
+
+function toggleDelStudent(e) {
+    if(e) e.stopPropagation();
+    if (!document.getElementById("subjectSelect").value) return alert("Select a subject first!");
+    isDeleteStudentMode = true;
+    isDeleteActMode = false;
+    loadSubjectData(); 
+}
+
+function toggleDelAct(e) {
+    if(e) e.stopPropagation();
+    if (!document.getElementById("subjectSelect").value) return alert("Select a subject first!");
+    isDeleteActMode = true;
+    isDeleteStudentMode = false;
+    loadSubjectData(); 
+}
+
+function deleteStudentRow(btn, event) {
+    if(event) event.stopPropagation();
+    if (!confirm("Are you sure you want to delete this student?")) return;
+    saveState();
+    var tr = btn.closest("tr");
+    tr.remove();
+    calculateGrades(false); 
+}
+
+function deleteActivity(index, event) {
+    if(event) event.stopPropagation();
+    if (!confirm("Are you sure you want to delete Activity " + (index + 1) + "? This will delete scores for all students in this column.")) {
+        return;
+    }
+    
+    saveState();
+    var subj = document.getElementById("subjectSelect").value;
+    maxScore.quizzes.splice(index, 1); 
+    
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    data.forEach(s => {
+        for (let i = index; i < maxScore.quizzes.length; i++) {
+            s['q'+i] = s['q'+(i+1)];
+        }
+        delete s['q'+maxScore.quizzes.length]; 
+    });
+    
+    localStorage.setItem("max_" + subj, JSON.stringify(maxScore));
+    localStorage.setItem("grades_" + subj, JSON.stringify(data));
+    
+    loadSubjectData();
+}
+
+function applyWeights() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return;
+
+    var wQ = parseFloat(document.getElementById("weight_q").value) || 0;
+    var wE = parseFloat(document.getElementById("weight_e").value) || 0;
+    var wA = parseFloat(document.getElementById("weight_a").value) || 0;
+    var total = wQ + wE + wA;
+
+    if (total !== 100) {
+        alert("WARNING: The total weight is " + total + "%. It must be exactly 100%. Reverting to previous weights.");
+        document.getElementById("weight_q").value = maxScore.weights.quizzes;
+        document.getElementById("weight_e").value = maxScore.weights.exam;
+        document.getElementById("weight_a").value = maxScore.weights.attendance;
+        return; 
+    }
+
+    saveState();
+    maxScore.weights = { quizzes: wQ, exam: wE, attendance: wA };
+    localStorage.setItem("max_" + subj, JSON.stringify(maxScore));
+    calculateGrades(false);
+}
+
+function addRow(s, shouldCalc) {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) {
+        alert("ACCESS DENIED: Please select or create a subject first before adding students!");
+        return;
+    }
+    s = s || {};
+    var tBody = document.getElementById("tableBody");
+    var tr = document.createElement("tr");
+    tr.className = "student-row";
+    var qInputs = "";
+    maxScore.quizzes.forEach(function(m, i) {
+        qInputs += '<td><input type="number" class="q'+i+'" value="'+(s['q'+i]||"")+'" oninput="validateInput(this, '+m+', \'Activity '+(i+1)+'\')"></td>';
+    });
+    
+    tr.innerHTML = '<td class="row-num"></td>' +
+        '<td class="name-cell"><input class="name" value="'+(s.name||"")+'" oninput="calculateGrades(false)"></td>' +
+        qInputs +
+        '<td><input type="number" class="exam" value="'+(s.exam||"")+'" oninput="validateInput(this, '+maxScore.exam+', \'Exam\')"></td>' +
+        '<td><input type="number" class="att" value="'+(s.attendance||"")+'" oninput="validateInput(this, '+maxScore.attendance+', \'Attendance\')"></td>' +
+        '<td class="final low">0</td>';
+    tBody.appendChild(tr);
+    
+    var savedWidth = document.getElementById("nameWidthSlider").value;
+    adjustNameWidth(savedWidth);
+
+    if (shouldCalc !== false) calculateGrades(false);
+}
+
+function validateInput(el, max, label) {
+    var val = parseFloat(el.value) || 0;
+    if (val > max && max > 0) {
+        alert("WARNING: Input (" + val + ") exceeds the Maximum Score (" + max + ") for " + label + "!");
+        el.value = ""; 
+    }
+    calculateGrades(false);
+}
+
+function calculateGrades(skipSave) {
+    var rows = document.querySelectorAll(".student-row");
+    var subj = document.getElementById("subjectSelect").value;
+    var dataToSave = [];
+
+    var wQ = parseFloat(maxScore.weights.quizzes) || 0;
+    var wE = parseFloat(maxScore.weights.exam) || 0;
+    var wA = parseFloat(maxScore.weights.attendance) || 0;
+
+    rows.forEach(function(r, index) {
+        var numCell = r.querySelector(".row-num");
+        if (numCell) {
+            if (isDeleteStudentMode) {
+                numCell.innerHTML = '<button class="del-btn" onclick="deleteStudentRow(this, event)">✖</button>';
+            } else {
+                numCell.textContent = index + 1;
+            }
+        }
+        
+        var nameInput = r.querySelector(".name");
+
+        var weightedSum = 0;
+        var totalWeightUsed = 0;
+
+        var activeQuizzes = maxScore.quizzes.filter(m => m > 0);
+        if (activeQuizzes.length > 0) {
+            var qEarnedPct = 0;
+            maxScore.quizzes.forEach(function(m, i) {
+                if (m > 0) {
+                    var qInput = r.querySelector(".q"+i);
+                    var v = qInput ? (parseFloat(qInput.value) || 0) : 0;
+                    qEarnedPct += (v / m);
+                }
+            });
+            weightedSum += (qEarnedPct / activeQuizzes.length) * wQ;
+            totalWeightUsed += wQ;
+        }
+
+        if (maxScore.exam > 0) {
+            var examInput = r.querySelector(".exam");
+            var exV = examInput ? (parseFloat(examInput.value) || 0) : 0;
+            weightedSum += (exV / maxScore.exam) * wE;
+            totalWeightUsed += wE;
+        }
+
+        if (maxScore.attendance > 0) {
+            var attInput = r.querySelector(".att");
+            var attV = attInput ? (parseFloat(attInput.value) || 0) : 0;
+            weightedSum += (attV / maxScore.attendance) * wA;
+            totalWeightUsed += wA;
+        }
+
+        var final = (totalWeightUsed > 0) ? (weightedSum / totalWeightUsed) * 100 : 0;
+        final = Math.min(100, parseFloat(final.toFixed(2)));
+
+        var fCell = r.querySelector(".final");
+        fCell.textContent = final;
+        fCell.className = "final " + (final >= 75 ? "high" : "low");
+
+        var obj = { 
+            name: nameInput ? nameInput.value : "", 
+            exam: r.querySelector(".exam") ? r.querySelector(".exam").value : "", 
+            attendance: r.querySelector(".att") ? r.querySelector(".att").value : "", 
+            final: final 
+        };
+        maxScore.quizzes.forEach(function(_, i) { 
+            var qInput = r.querySelector(".q"+i);
+            obj["q"+i] = qInput ? qInput.value : ""; 
+        });
+        dataToSave.push(obj);
+    });
+    
+    if(subj && !skipSave) localStorage.setItem("grades_" + subj, JSON.stringify(dataToSave));
+}
+
+function saveMax(type, val) {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return;
+    saveState();
+    var num = parseFloat(val) || 0;
+    if (type === 'exam') maxScore.exam = num;
+    else if (type === 'att') maxScore.attendance = num;
+    else maxScore.quizzes[type] = num;
+    localStorage.setItem("max_" + subj, JSON.stringify(maxScore));
+    loadSubjectData();
+}
+
+function addQuizBox() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return alert("Please select a subject first!");
+    saveState();
+    maxScore.quizzes.push(0); 
+    localStorage.setItem("max_" + subj, JSON.stringify(maxScore));
+    loadSubjectData(); 
+}
+
+function clearScores() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return alert("Please select a subject first!");
+    
+    if (!confirm("Are you sure? This will clear all Activity, Exam, and Attendance scores, but keep the student names.")) return;
+    
+    saveState();
+    var rows = document.querySelectorAll(".student-row");
+    rows.forEach(function(r) {
+        var scoreInputs = r.querySelectorAll("input[type='number']");
+        scoreInputs.forEach(input => input.value = "");
+    });
+    calculateGrades(false);
+}
+
+function rankByGrade() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return;
+    saveState();
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    data.sort((a, b) => b.final - a.final);
+    localStorage.setItem("grades_" + subj, JSON.stringify(data));
+    loadSubjectData();
+}
+
+function rankByName() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return;
+    saveState();
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    data.sort((a, b) => a.name.localeCompare(b.name));
+    localStorage.setItem("grades_" + subj, JSON.stringify(data));
+    loadSubjectData();
+}
+
+function deleteSubject() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj || !confirm("Delete " + subj + "?")) return;
+    subjects = subjects.filter(s => s !== subj);
+    localStorage.setItem("subjects", JSON.stringify(subjects));
+    localStorage.removeItem("grades_" + subj);
+    localStorage.removeItem("max_" + subj);
+    updateSubjectDropdown();
+    loadSubjectData();
+}
+
+function searchStudents() {
+    var q = document.getElementById("searchStudent").value.toLowerCase();
+    document.querySelectorAll(".student-row").forEach(r => {
+        var name = r.querySelector(".name").value.toLowerCase();
+        r.style.display = name.includes(q) ? "" : "none";
+    });
+}
+
+function saveState() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return;
+    undoStack.push({ grades: localStorage.getItem("grades_" + subj), max: localStorage.getItem("max_" + subj) });
+    if (undoStack.length > 25) undoStack.shift();
+    redoStack = [];
+}
+
+function undo() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj || undoStack.length === 0) return;
+    var current = { grades: localStorage.getItem("grades_" + subj), max: localStorage.getItem("max_" + subj) };
+    redoStack.push(current);
+    var prev = undoStack.pop();
+    localStorage.setItem("grades_" + subj, prev.grades);
+    localStorage.setItem("max_" + subj, prev.max);
+    loadSubjectData();
+}
+
+function redo() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj || redoStack.length === 0) return;
+    undoStack.push({ grades: localStorage.getItem("grades_" + subj), max: localStorage.getItem("max_" + subj) });
+    var next = redoStack.pop();
+    localStorage.setItem("grades_" + subj, next.grades);
+    localStorage.setItem("max_" + subj, next.max);
+    loadSubjectData();
+}
+
+function copyGrades() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return alert("Select a subject first!");
+    
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    if (data.length === 0) return alert("No grades to copy!");
+
+    var formattedText = data.map((student, index) => {
+        var cleanName = (student.name || "Unknown").replace(/^\d+[\.\)]\s*/, '').trim(); 
+        var grade = student.final !== undefined ? student.final : 0;
+        return (index + 1) + ". " + cleanName + " - " + grade;
+    }).join("\n");
+
+    navigator.clipboard.writeText(formattedText).then(() => alert("Grades Copied successfully!"));
+}
+
+function exportNames() {
+    var subj = document.getElementById("subjectSelect").value;
+    if(!subj) return alert("Select a subject first!");
+    var data = JSON.parse(localStorage.getItem("grades_" + subj)) || [];
+    var names = data.map(s => s.name).join("\n");
+    if(!names) return alert("No names to copy");
+    navigator.clipboard.writeText(names).then(() => alert("Names copied to clipboard!"));
+}
+
+function importNames() {
+    var subj = document.getElementById("subjectSelect").value;
+    if (!subj) return alert("ACCESS DENIED: Please select a subject first!");
+    var input = prompt("Paste student names (one per line or comma separated):");
+    if (!input) return;
+    saveState();
+    var list = input.split(/[,\n]/).map(n => n.trim()).filter(n => n !== "");
+    list.forEach(n => addRow({name: n}, false));
+    calculateGrades(false);
+}
+
+window.onload = updateSubjectDropdown;
+</script>
+</head>
+
+<body>
+
+<div class="header-bar">
+    <h2>KSGC CALCULATOR</h2>
+</div>
+
+<div id="controls">
+    <button onclick="createSubject()" style="background:#27ae60;color:white; border:none;">+ New Subject</button>
+    <button onclick="deleteSubject()" class="danger-btn">Delete Sub.</button>
+    
+    <select id="subjectSelect" onchange="loadSubjectData()">
+        <option value="">--Select Subject--</option>
+    </select>
+
+    <input type="text" id="searchStudent" placeholder="Search Student..." oninput="searchStudents()">
+
+    <div class="slider-container">
+        <label for="nameWidthSlider">Name Width:</label>
+        <input type="range" id="nameWidthSlider" min="50" max="350" value="150" oninput="adjustNameWidth(this.value)">
+    </div>
+    
+    <button class="history-btn" onclick="undo()">⟲ Undo</button>
+    <button class="history-btn" onclick="redo()">⟳ Redo</button>
+
+    <button onclick="rankByGrade()">Rank Grade</button>
+    <button onclick="rankByName()">Rank A–Z</button>
+    
+    <button onclick="addRow({}, true)" class="action-btn">+ Add Student</button>
+    <button onclick="addQuizBox()" class="action-btn">+ Add Activity</button>
+    
+    <button id="btnDelStudent" onclick="toggleDelStudent(event)" class="danger-btn">Del Student</button>
+    <button id="btnDelAct" onclick="toggleDelAct(event)" class="danger-btn">Del Act.</button>
+    
+    <button onclick="clearScores()" class="clear-btn">Clear Scores</button>
+    
+    <button onclick="copyGrades()" class="data-btn">Copy Grades</button>
+    <button onclick="exportNames()" style="background:#16a085; color:white; border:none;">Copy Names</button>
+    <button onclick="importNames()" style="background:#2980b9; color:white; border:none;">Add Names</button>
+</div>
+
+<div class="table-container">
+    <table>
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+</body>
+</html> 
