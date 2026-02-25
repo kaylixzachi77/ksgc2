@@ -1,35 +1,35 @@
 {
   "name": {
-    "top": "122.953px",
-    "left": "158px",
+    "top": "136.211px",
+    "left": "141.749px",
     "font": "'Roboto', sans-serif",
-    "scale": "21",
+    "scale": "33",
     "color": "#ef4444"
   },
   "text": {
-    "top": "139.727px",
-    "left": "156.37px",
-    "font": "'Montserrat', sans-serif",
-    "scale": "28",
-    "width": "150"
+    "top": "162.606px",
+    "left": "140.791px",
+    "font": "'Roboto', sans-serif",
+    "scale": "41",
+    "width": "138"
   },
   "teacher": {
-    "top": "202.582px",
-    "left": "70.5824px",
+    "top": "235.185px",
+    "left": "44.884px",
     "font": "'Playfair Display', serif",
     "scale": "41",
     "color": "#000000"
   },
   "signature": {
-    "top": "196.508px",
-    "left": "83.0742px",
-    "font": "'Great Vibes', cursive",
-    "scale": "19",
+    "top": "227.253px",
+    "left": "61.2649px",
+    "font": "'Parisienne', cursive",
+    "scale": "16",
     "color": "#0f172a"
   },
   "pic": {
-    "top": "106.533px",
-    "left": "55.1594px",
-    "scale": "73"
+    "top": "124.907px",
+    "left": "25.1857px",
+    "scale": "82"
   }
 }
