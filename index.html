@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KSGC Office - Loading</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: #ffffff;
+      color: #333;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container { text-align: center; width: 80%; max-width: 300px; }
+
+    /* Logo Placeholder */
+    .logo {
+      font-size: 24px; font-weight: 800; color: #1a252f;
+      letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;
+    }
+
+    /* Progress Bar Style */
+    .progress-container {
+      width: 100%; height: 6px; background: #e0e0e0;
+      border-radius: 10px; overflow: hidden; margin-bottom: 10px;
+    }
+
+    #progress-bar {
+      width: 0%; height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width 0.3s ease;
+    }
+
+    #status { font-size: 14px; font-weight: 600; color: #555; margin: 10px 0 5px; }
+    #percent { font-size: 12px; color: #999; }
+
+    .btn-retry {
+      margin-top: 20px; padding: 10px 20px; background: #1a252f;
+      color: white; border: none; border-radius: 5px; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="logo">KSGC OFFICE</div>
+    
+    <div class="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+    
+    <div id="status">Initializing...</div>
+    <div id="percent">0%</div>
+  </div>
+
+  <script>
+    const SHELL_URL = 'https://kaylixzachi77.github.io/ksgc2/shell-main.html';
+    const CACHE_KEY = 'gcec_saved_shell';
+    
+    const bar = document.getElementById('progress-bar');
+    const statusText = document.getElementById('status');
+    const percentText = document.getElementById('percent');
+
+    function updateUI(percent, status) {
+      bar.style.width = percent + '%';
+      percentText.innerText = percent + '%';
+      if(status) statusText.innerText = status;
+    }
+
+    function loadHTML(code) {
+      document.open();
+      document.write(code);
+      document.close();
+    }
+
+    async function startApp() {
+      const savedCode = localStorage.getItem(CACHE_KEY);
+
+      // 1. KUNG MAY OFFLINE FILE NA, LOAD AGAD (INSTANT OPEN)
+      if (savedCode) {
+        updateUI(100, "Starting App...");
+        setTimeout(() => loadHTML(savedCode), 500);
+        
+        // Pero mag-check pa rin sa background kung may update (Silent Update)
+        try {
+          const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
+          if (res.ok) {
+            const newCode = await res.text();
+            localStorage.setItem(CACHE_KEY, newCode);
+            console.log("App updated in background. Will take effect next restart.");
+          }
+        } catch (e) { /* Hayaan lang kung walang net */ }
+        
+        return;
+      }
+
+      // 2. KUNG FIRST TIME AT WALANG SAVED FILE, MAG-DOWNLOAD (WITH PROGRESS)
+      updateUI(10, "Connecting to server...");
+      
+      try {
+        const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
+        if (!res.ok) throw new Error();
+
+        updateUI(40, "Downloading resources...");
+        const htmlCode = await res.text();
+        
+        updateUI(80, "Finalizing...");
+        localStorage.setItem(CACHE_KEY, htmlCode);
+        
+        updateUI(100, "Done!");
+        setTimeout(() => loadHTML(htmlCode), 800);
+
+      } catch (error) {
+        // 3. KUNG WALANG NET AT WALANG SAVED FILE
+        statusText.innerHTML = "⚠️ Setup requires internet";
+        statusText.style.color = "#e74c3c";
+        percentText.innerHTML = "<button class='btn-retry' onclick='location.reload()'>TRY AGAIN</button>";
+      }
+    }
+
+    // Small delay bago mag-start para hindi "blink" lang ang makita
+    setTimeout(startApp, 500);
+  </script>
+
+</body>
+</html>
