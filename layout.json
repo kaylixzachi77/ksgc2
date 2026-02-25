@@ -1,0 +1,35 @@
+{
+  "name": {
+    "top": "122.953px",
+    "left": "158px",
+    "font": "'Roboto', sans-serif",
+    "scale": "21",
+    "color": "#ef4444"
+  },
+  "text": {
+    "top": "139.727px",
+    "left": "156.37px",
+    "font": "'Montserrat', sans-serif",
+    "scale": "28",
+    "width": "150"
+  },
+  "teacher": {
+    "top": "202.582px",
+    "left": "70.5824px",
+    "font": "'Playfair Display', serif",
+    "scale": "41",
+    "color": "#000000"
+  },
+  "signature": {
+    "top": "196.508px",
+    "left": "83.0742px",
+    "font": "'Great Vibes', cursive",
+    "scale": "19",
+    "color": "#0f172a"
+  },
+  "pic": {
+    "top": "106.533px",
+    "left": "55.1594px",
+    "scale": "73"
+  }
+}
