@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <title>KSGC Office - Loading</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="manifest" href="manifest.json">
+  
+  <meta name="theme-color" content="#1a252f">
+  <link rel="apple-touch-icon" href="icon.png">
+
   <style>
     body {
       background: #ffffff;
@@ -20,13 +26,11 @@
 
     .container { text-align: center; width: 80%; max-width: 300px; }
 
-    /* Logo Placeholder */
     .logo {
       font-size: 24px; font-weight: 800; color: #1a252f;
       letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;
     }
 
-    /* Progress Bar Style */
     .progress-container {
       width: 100%; height: 6px; background: #e0e0e0;
       border-radius: 10px; overflow: hidden; margin-bottom: 10px;
@@ -61,6 +65,16 @@
   </div>
 
   <script>
+    // --- 1. REGISTER SERVICE WORKER (Para maging Offline Ready) ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW Registered!'))
+          .catch(err => console.log('SW Failed', err));
+      });
+    }
+
+    // --- 2. MAIN BOOTLOADER LOGIC ---
     const SHELL_URL = 'https://kaylixzachi77.github.io/ksgc2/shell-main.html';
     const CACHE_KEY = 'gcec_saved_shell';
     
@@ -83,50 +97,46 @@
     async function startApp() {
       const savedCode = localStorage.getItem(CACHE_KEY);
 
-      // 1. KUNG MAY OFFLINE FILE NA, LOAD AGAD (INSTANT OPEN)
+      // KUNG MAY OFFLINE FILE NA, LOAD AGAD
       if (savedCode) {
         updateUI(100, "Starting App...");
         setTimeout(() => loadHTML(savedCode), 500);
         
-        // Pero mag-check pa rin sa background kung may update (Silent Update)
+        // Silent update check
         try {
           const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
           if (res.ok) {
             const newCode = await res.text();
             localStorage.setItem(CACHE_KEY, newCode);
-            console.log("App updated in background. Will take effect next restart.");
           }
-        } catch (e) { /* Hayaan lang kung walang net */ }
-        
+        } catch (e) { }
         return;
       }
 
-      // 2. KUNG FIRST TIME AT WALANG SAVED FILE, MAG-DOWNLOAD (WITH PROGRESS)
-      updateUI(10, "Connecting to server...");
+      // KUNG FIRST TIME, MAG-DOWNLOAD
+      updateUI(10, "Connecting...");
       
       try {
         const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
         if (!res.ok) throw new Error();
 
-        updateUI(40, "Downloading resources...");
+        updateUI(50, "Downloading System...");
         const htmlCode = await res.text();
         
-        updateUI(80, "Finalizing...");
+        updateUI(90, "Saving to Device...");
         localStorage.setItem(CACHE_KEY, htmlCode);
         
         updateUI(100, "Done!");
-        setTimeout(() => loadHTML(htmlCode), 800);
+        setTimeout(() => loadHTML(htmlCode), 500);
 
       } catch (error) {
-        // 3. KUNG WALANG NET AT WALANG SAVED FILE
         statusText.innerHTML = "⚠️ Setup requires internet";
         statusText.style.color = "#e74c3c";
-        percentText.innerHTML = "<button class='btn-retry' onclick='location.reload()'>TRY AGAIN</button>";
+        percentText.innerHTML = "<button class='btn-retry' onclick='location.reload()'>RETRY</button>";
       }
     }
 
-    // Small delay bago mag-start para hindi "blink" lang ang makita
-    setTimeout(startApp, 500);
+    setTimeout(startApp, 800);
   </script>
 
 </body>
