@@ -1,143 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>KSGC Office - Loading</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <link rel="manifest" href="manifest.json">
-  
-  <meta name="theme-color" content="#1a252f">
-  <link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSGC | Download</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-dark: #1e293b;
+            --primary-gradient: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8);
+        }
 
-  <style>
-    body {
-      background: #ffffff;
-      color: #333;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .container { text-align: center; width: 80%; max-width: 300px; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-    .logo {
-      font-size: 24px; font-weight: 800; color: #1a252f;
-      letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase;
-    }
+        /* CONTINUOUS SMOOTH RAINBOW RAIN */
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
 
-    .progress-container {
-      width: 100%; height: 6px; background: #e0e0e0;
-      border-radius: 10px; overflow: hidden; margin-bottom: 10px;
-    }
+        /* CONTENT CARD */
+        .main-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 3rem 2rem;
+            border-radius: 40px;
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+            animation: cardAppear 1s ease-out;
+        }
 
-    #progress-bar {
-      width: 0%; height: 100%;
-      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-      transition: width 0.3s ease;
-    }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    #status { font-size: 14px; font-weight: 600; color: #555; margin: 10px 0 5px; }
-    #percent { font-size: 12px; color: #999; }
+        .app-icon {
+            width: 110px;
+            height: 110px;
+            border-radius: 28px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
 
-    .btn-retry {
-      margin-top: 20px; padding: 10px 20px; background: #1a252f;
-      color: white; border: none; border-radius: 5px; cursor: pointer;
-    }
-  </style>
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .tagline {
+            color: #64748b;
+            margin-bottom: 2.5rem;
+            font-weight: 500;
+        }
+
+        /* ANIMATED DOWNLOAD BUTTON */
+        .dl-container {
+            position: relative;
+            display: inline-block;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .btn-dl {
+            background: #1e293b;
+            color: white;
+            padding: 18px 45px;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none;
+            cursor: pointer;
+            z-index: 2;
+            position: relative;
+            transition: transform 0.2s;
+        }
+
+        /* RAINBOW BORDER EFFECT */
+        .dl-container::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            background: var(--primary-gradient);
+            background-size: 400%;
+            z-index: 1;
+            border-radius: 100px;
+            animation: rainbowBorder 8s linear infinite;
+            filter: blur(8px);
+            opacity: 0.6;
+        }
+
+        @keyframes rainbowBorder {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        /* PROGRESS VIEW */
+        #progress-section { display: none; }
+
+        .track {
+            width: 100%;
+            height: 12px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .fill {
+            width: 0%;
+            height: 100%;
+            background: var(--primary-gradient);
+            background-size: 400%;
+            animation: rainbowBorder 3s linear infinite;
+        }
+
+        .retry {
+            display: none;
+            margin-top: 15px;
+            color: #ef4444;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="logo">KSGC OFFICE</div>
-    
-    <div class="progress-container">
-      <div id="progress-bar"></div>
+    <canvas id="canvas"></canvas>
+
+    <div class="main-card">
+        <div id="ui-initial">
+            <img src="https://github.com/kaylixzachi77/ksgc2/blob/main/icon.png?raw=true" alt="KSGC Logo" class="app-icon">
+            <h1>KSGC APP</h1>
+            <p class="tagline">Official School Record Manager</p>
+            
+            <div class="dl-container">
+                <button class="btn-dl" onclick="start()">
+                    <i class="fas fa-arrow-down"></i> Download APK
+                </button>
+            </div>
+        </div>
+
+        <div id="progress-section">
+            <h2 style="font-family:'Outfit';">Downloading...</h2>
+            <div class="track">
+                <div class="fill" id="bar"></div>
+            </div>
+            <p id="percent" style="font-weight:bold; color:#1e293b">0%</p>
+            <div id="retry-link" class="retry" onclick="location.reload()">
+                Try again if download failed
+            </div>
+        </div>
     </div>
-    
-    <div id="status">Initializing...</div>
-    <div id="percent">0%</div>
-  </div>
 
-  <script>
-    // --- 1. REGISTER SERVICE WORKER (Para maging Offline Ready) ---
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('SW Registered!'))
-          .catch(err => console.log('SW Failed', err));
-      });
-    }
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
 
-    // --- 2. MAIN BOOTLOADER LOGIC ---
-    const SHELL_URL = 'https://kaylixzachi77.github.io/ksgc2/shell-main.html';
-    const CACHE_KEY = 'gcec_saved_shell';
-    
-    const bar = document.getElementById('progress-bar');
-    const statusText = document.getElementById('status');
-    const percentText = document.getElementById('percent');
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.onresize = resize;
+        resize();
 
-    function updateUI(percent, status) {
-      bar.style.width = percent + '%';
-      percentText.innerText = percent + '%';
-      if(status) statusText.innerText = status;
-    }
+        class Dot {
+            constructor() {
+                this.init();
+                this.y = Math.random() * canvas.height; // Start dots at random heights initially
+            }
+            init() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.size = Math.random() * 4 + 2; // Smaller elegant dots
+                this.speed = Math.random() * 2 + 1.5; // Smooth slow fall
+                this.hue = Math.random() * 360;
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height) this.init();
+            }
+            draw() {
+                ctx.fillStyle = `hsl(${this.hue}, 70%, 60%)`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
 
-    function loadHTML(code) {
-      document.open();
-      document.write(code);
-      document.close();
-    }
+        // Populate dots
+        for (let i = 0; i < 60; i++) {
+            dots.push(new Dot());
+        }
 
-    async function startApp() {
-      const savedCode = localStorage.getItem(CACHE_KEY);
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            dots.forEach(d => {
+                d.update();
+                d.draw();
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
 
-      // KUNG MAY OFFLINE FILE NA, LOAD AGAD
-      if (savedCode) {
-        updateUI(100, "Starting App...");
-        setTimeout(() => loadHTML(savedCode), 500);
-        
-        // Silent update check
-        try {
-          const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
-          if (res.ok) {
-            const newCode = await res.text();
-            localStorage.setItem(CACHE_KEY, newCode);
-          }
-        } catch (e) { }
-        return;
-      }
-
-      // KUNG FIRST TIME, MAG-DOWNLOAD
-      updateUI(10, "Connecting...");
-      
-      try {
-        const res = await fetch(SHELL_URL + '?t=' + new Date().getTime());
-        if (!res.ok) throw new Error();
-
-        updateUI(50, "Downloading System...");
-        const htmlCode = await res.text();
-        
-        updateUI(90, "Saving to Device...");
-        localStorage.setItem(CACHE_KEY, htmlCode);
-        
-        updateUI(100, "Done!");
-        setTimeout(() => loadHTML(htmlCode), 500);
-
-      } catch (error) {
-        statusText.innerHTML = "⚠️ Setup requires internet";
-        statusText.style.color = "#e74c3c";
-        percentText.innerHTML = "<button class='btn-retry' onclick='location.reload()'>RETRY</button>";
-      }
-    }
-
-    setTimeout(startApp, 800);
-  </script>
-
+        function start() {
+            document.getElementById('ui-initial').style.display = 'none';
+            document.getElementById('progress-section').style.display = 'block';
+            
+            let p = 0;
+            const bar = document.getElementById('bar');
+            const txt = document.getElementById('percent');
+            
+            const int = setInterval(() => {
+                p += Math.random() * 8;
+                if (p >= 100) {
+                    p = 100;
+                    clearInterval(int);
+                    document.getElementById('retry-link').style.display = 'block';
+                    window.location.href = "https://github.com/kaylixzachi77/ksgc2/releases/download/ksgc/ksgc.apk";
+                }
+                bar.style.width = p + '%';
+                txt.innerText = Math.floor(p) + '%';
+            }, 100);
+        }
+    </script>
 </body>
 </html>
