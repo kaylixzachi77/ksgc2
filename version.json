@@ -1,8 +1,10 @@
 {
-  "version": "1.6",
-  "notes": " MAY APPLICATION NA TAYO.",
+  "version": "1.7",
+  "notes": " ADDED NEW BUTTONS ONLY.",
   "about": "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon",
   "files": {
     "GRADE": "grade.html"
+    "PRINTER": "printer.html"
+    "MODULES": "module.html"
   }
 }
