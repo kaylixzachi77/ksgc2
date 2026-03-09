@@ -1,6 +1,6 @@
 {
-  "version": "1.7",
-  "notes": "ADDED NEW BUTTONS ONLY.",
+  "version": "1.8",
+  "notes": "ADDED NEW BUTTONS ONLY AND FIX THE ERROR.",
   "about": "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon",
   "files": {
     "GRADE": "grade.html",
