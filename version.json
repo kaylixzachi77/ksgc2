@@ -1,10 +1,10 @@
 {
   "version": "1.7",
-  "notes": " ADDED NEW BUTTONS ONLY.",
+  "notes": "ADDED NEW BUTTONS ONLY.",
   "about": "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon",
   "files": {
-    "GRADE": "grade.html"
-    "PRINTER": "printer.html"
+    "GRADE": "grade.html",
+    "PRINTER": "printer.html",
     "MODULES": "module.html"
   }
 }
