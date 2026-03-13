@@ -263,15 +263,70 @@ const BASE = "https://kaylixzachi77.github.io/ksgc2/";
 const VERSION_URL = BASE + "version.json";
 const BROADCAST_URL = BASE + "broadcast.json";
 
+// --- INDEXEDDB SETUP ---
+const DB_NAME = "GCEC_Database";
+const DB_VERSION = 1;
+const STORE_NAME = "filesStore";
+
+function initDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onerror = (e) => reject("IndexedDB error: " + e.target.errorCode);
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME);
+            }
+        };
+    });
+}
+
+async function setIDB(key, value) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.put(value, key);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e);
+    });
+}
+
+async function getIDB(key) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = (e) => reject(e);
+    });
+}
+
+async function removeIDB(key) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const request = store.delete(key);
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e);
+    });
+}
+
 // --- STORAGE KEYS ---
-const SERVER_STORE = 'gcec_server_files'; 
-const LOCAL_STORE = 'gcec_local_files';   
+const SERVER_STORE = 'gcec_server_files'; // Now points to IndexedDB key
+const LOCAL_STORE = 'gcec_local_files';   // Now points to IndexedDB key
 const VER = 'gcec_ver';
 const NOTES = 'gcec_notes';
 const ABOUT = 'gcec_about'; 
 const BROADCAST_MSG = 'gcec_broadcast_msg';
 const BROADCAST_ACTIVE = 'gcec_broadcast_active';
 const THEME_KEY = 'gcec_theme';
+
+// Note: VER, NOTES, ABOUT, THEME, etc. stay in localStorage because they are tiny strings
+// and are needed instantly on load. Only HTML files are moved to IndexedDB.
 
 // --- DOM ELEMENTS ---
 const frame = document.getElementById("frame");
@@ -318,9 +373,9 @@ function toggleMenu(){
   toggleBtn.textContent = open ? "❯" : "❮";
 }
 
-function loadOffline(){
-  const serverFiles = JSON.parse(localStorage.getItem(SERVER_STORE) || '{}');
-  const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+async function loadOffline(){
+  const serverFiles = await getIDB(SERVER_STORE) || {};
+  const localFiles = await getIDB(LOCAL_STORE) || {};
   
   const version = localStorage.getItem(VER) || 'No Version';
   const notes = localStorage.getItem(NOTES) || 'Update notes will appear here';
@@ -379,8 +434,8 @@ function loadOffline(){
 }
 
 // --- LOCAL FILE MANAGEMENT ---
-function openManageLocal() {
-    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+async function openManageLocal() {
+    const localFiles = await getIDB(LOCAL_STORE) || {};
     const localKeys = Object.keys(localFiles);
     
     manageFileList.innerHTML = '';
@@ -420,9 +475,9 @@ function openAddFile() {
     toggleMenu(); 
 }
 
-function editLocalFile(filename) {
+async function editLocalFile(filename) {
     editingFileName = filename;
-    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    const localFiles = await getIDB(LOCAL_STORE) || {};
     
     modalTitle.textContent = "Edit Local File";
     document.getElementById("localFileName").value = filename;
@@ -436,17 +491,17 @@ function closeAddFile() {
     addFilePopup.style.display = "none";
 }
 
-function saveLocalFile() {
+async function saveLocalFile() {
     const name = document.getElementById("localFileName").value.trim();
     const code = document.getElementById("localFileCode").value;
     
     if(!name) return alert("Please enter a file name.");
     if(!code) return alert("Please paste the HTML code.");
 
-    const serverFiles = JSON.parse(localStorage.getItem(SERVER_STORE) || '{}');
+    const serverFiles = await getIDB(SERVER_STORE) || {};
     if(serverFiles[name]) return alert("Error: You cannot use the same name as an Official File.");
 
-    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    const localFiles = await getIDB(LOCAL_STORE) || {};
     
     if(editingFileName && editingFileName !== name) {
         if(localFiles[name]) {
@@ -458,36 +513,36 @@ function saveLocalFile() {
     }
 
     localFiles[name] = code;
-    localStorage.setItem(LOCAL_STORE, JSON.stringify(localFiles));
+    await setIDB(LOCAL_STORE, localFiles);
     
     closeAddFile();
     alert(name + " saved successfully!");
     
     frame.srcdoc = code;
-    loadOffline();
+    await loadOffline();
 }
 
-function deleteLocalFileFromEdit() {
+async function deleteLocalFileFromEdit() {
     if(!editingFileName) return;
     if(!confirm("Are you sure you want to permanently delete '" + editingFileName + "'?")) return;
     
-    const localFiles = JSON.parse(localStorage.getItem(LOCAL_STORE) || '{}');
+    const localFiles = await getIDB(LOCAL_STORE) || {};
     delete localFiles[editingFileName];
-    localStorage.setItem(LOCAL_STORE, JSON.stringify(localFiles));
+    await setIDB(LOCAL_STORE, localFiles);
     
     closeAddFile();
     frame.srcdoc = ""; 
-    loadOffline();
+    await loadOffline();
     openManageLocal(); // Reopen manage screen to see updated list
 }
 
-function resetLocalFiles() {
+async function resetLocalFiles() {
     if(!confirm("WARNING: This will permanently DELETE ALL your custom local files. Continue?")) return;
 
-    localStorage.removeItem(LOCAL_STORE);
+    await removeIDB(LOCAL_STORE);
     closeManageLocal();
     frame.srcdoc = ""; 
-    loadOffline();
+    await loadOffline();
     alert("All local files have been cleared.");
 }
 
@@ -541,7 +596,10 @@ async function startUpdate(){
       files[key] = await res.text();
     }
 
-    localStorage.setItem(SERVER_STORE, JSON.stringify(files));
+    // Save to IndexedDB instead of localStorage
+    await setIDB(SERVER_STORE, files);
+    
+    // Metadata stays in localStorage
     localStorage.setItem(VER, pendingUpdateData.version);
     localStorage.setItem(NOTES, pendingUpdateData.notes || '');
     
@@ -600,11 +658,33 @@ function showAbout(){
   alert(dynamicAbout + "\n\nVersion: " + currentVer);
 }
 
+// --- MIGRATION (Move old LocalStorage data to IndexedDB) ---
+async function migrateFromLocalStorage() {
+    const oldServer = localStorage.getItem(SERVER_STORE);
+    if (oldServer) {
+        try {
+            await setIDB(SERVER_STORE, JSON.parse(oldServer));
+            localStorage.removeItem(SERVER_STORE);
+        } catch (e) { console.error("Migration failed for server files", e); }
+    }
+    const oldLocal = localStorage.getItem(LOCAL_STORE);
+    if (oldLocal) {
+        try {
+            await setIDB(LOCAL_STORE, JSON.parse(oldLocal));
+            localStorage.removeItem(LOCAL_STORE);
+        } catch (e) { console.error("Migration failed for local files", e); }
+    }
+}
+
 // Initialize
-window.onload = () => {
+window.onload = async () => {
   loadTheme();
   applySavedBroadcast(); 
-  loadOffline();
+  
+  // Attempt migration first so data isn't lost
+  await migrateFromLocalStorage();
+  
+  await loadOffline();
   checkUpdateLogic(); 
   checkBroadcast(); 
 };
