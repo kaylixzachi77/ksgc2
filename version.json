@@ -1,6 +1,6 @@
 {
-  "version": "1.9",
-  "notes": "ADDED BACKUP AND RESTORE! IN LOCAL FILES.",
+  "version": "1.10",
+  "notes": "ADDED MODULE",
   "about": "Owner : Kaylix Zachi\nDeveloper : Jasper Simbahon",
   "files": {
     "GRADE": "grade.html",
