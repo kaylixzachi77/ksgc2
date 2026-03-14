@@ -254,6 +254,12 @@
     <button style="background:var(--accent-1); color:#fff; font-size:11px; padding: 8px 0;" onclick="openManageLocal()">Manage Local</button>
   </div>
 
+  <div style="width:100%; display:flex; gap:5px; margin-top: 5px;">
+    <button style="background:#3498db; color:#fff; font-size:11px; padding: 8px 0;" onclick="exportBackup()">Export Backup</button>
+    <button style="background:#e67e22; color:#fff; font-size:11px; padding: 8px 0;" onclick="document.getElementById('importFile').click()">Import Backup</button>
+    <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(event)">
+  </div>
+
   <button style="margin-top: auto; background: var(--bg-main); border: 1px solid var(--border); color: var(--text-muted);" onclick="showAbout()">About this app</button>
 </div>
 
@@ -316,17 +322,14 @@ async function removeIDB(key) {
 }
 
 // --- STORAGE KEYS ---
-const SERVER_STORE = 'gcec_server_files'; // Now points to IndexedDB key
-const LOCAL_STORE = 'gcec_local_files';   // Now points to IndexedDB key
+const SERVER_STORE = 'gcec_server_files'; 
+const LOCAL_STORE = 'gcec_local_files';   
 const VER = 'gcec_ver';
 const NOTES = 'gcec_notes';
 const ABOUT = 'gcec_about'; 
 const BROADCAST_MSG = 'gcec_broadcast_msg';
 const BROADCAST_ACTIVE = 'gcec_broadcast_active';
 const THEME_KEY = 'gcec_theme';
-
-// Note: VER, NOTES, ABOUT, THEME, etc. stay in localStorage because they are tiny strings
-// and are needed instantly on load. Only HTML files are moved to IndexedDB.
 
 // --- DOM ELEMENTS ---
 const frame = document.getElementById("frame");
@@ -417,7 +420,7 @@ async function loadOffline(){
       });
   }
 
-  // Render Local Files (Clean list, no side buttons)
+  // Render Local Files
   localFileButtons.innerHTML = '';
   if (localKeys.length === 0) {
       localFileButtons.innerHTML = '<div style="color:var(--text-muted); font-size:10px; text-align:center;">No local files added yet.</div>';
@@ -470,7 +473,7 @@ function openAddFile() {
     modalTitle.textContent = "Add Local File";
     document.getElementById("localFileName").value = "";
     document.getElementById("localFileCode").value = "";
-    btnDeleteLocal.style.display = "none"; // Hide delete button on Add
+    btnDeleteLocal.style.display = "none"; 
     addFilePopup.style.display = "flex";
     toggleMenu(); 
 }
@@ -483,7 +486,7 @@ async function editLocalFile(filename) {
     document.getElementById("localFileName").value = filename;
     document.getElementById("localFileCode").value = localFiles[filename];
     
-    btnDeleteLocal.style.display = "block"; // Show delete button on Edit
+    btnDeleteLocal.style.display = "block"; 
     addFilePopup.style.display = "flex";
 }
 
@@ -533,7 +536,7 @@ async function deleteLocalFileFromEdit() {
     closeAddFile();
     frame.srcdoc = ""; 
     await loadOffline();
-    openManageLocal(); // Reopen manage screen to see updated list
+    openManageLocal(); 
 }
 
 async function resetLocalFiles() {
@@ -544,6 +547,71 @@ async function resetLocalFiles() {
     frame.srcdoc = ""; 
     await loadOffline();
     alert("All local files have been cleared.");
+}
+
+// --- BACKUP & RESTORE LOGIC ---
+async function exportBackup() {
+    try {
+        const localFiles = await getIDB(LOCAL_STORE) || {};
+        if (Object.keys(localFiles).length === 0) {
+            return alert("No local files to backup.");
+        }
+        
+        // Convert the IndexedDB object to a JSON string
+        const dataStr = JSON.stringify(localFiles, null, 2);
+        
+        // Create a blob and trigger a download
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        const dateString = new Date().toISOString().slice(0, 10);
+        a.download = `GCEC_LocalFiles_Backup_${dateString}.json`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (e) {
+        alert("Export failed: " + e);
+    }
+}
+
+function importBackup(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            if (typeof importedData !== 'object' || Array.isArray(importedData)) {
+                throw new Error("Invalid backup format.");
+            }
+
+            const currentFiles = await getIDB(LOCAL_STORE) || {};
+            let count = 0;
+
+            for (const key in importedData) {
+                // If the file already exists, it will be overwritten.
+                currentFiles[key] = importedData[key];
+                count++;
+            }
+
+            await setIDB(LOCAL_STORE, currentFiles);
+            await loadOffline(); // Refresh UI to show the imported files
+            
+            alert(`Successfully imported ${count} local files!`);
+            toggleMenu(); // Close the menu if you want
+        } catch (err) {
+            alert("Import failed. Make sure you selected a valid JSON backup file.\nError: " + err.message);
+        } finally {
+            event.target.value = ""; // Reset the input so the same file can be selected again if needed
+        }
+    };
+    reader.readAsText(file);
 }
 
 // --- UPDATE LOGIC ---
@@ -596,10 +664,8 @@ async function startUpdate(){
       files[key] = await res.text();
     }
 
-    // Save to IndexedDB instead of localStorage
     await setIDB(SERVER_STORE, files);
     
-    // Metadata stays in localStorage
     localStorage.setItem(VER, pendingUpdateData.version);
     localStorage.setItem(NOTES, pendingUpdateData.notes || '');
     
@@ -681,7 +747,6 @@ window.onload = async () => {
   loadTheme();
   applySavedBroadcast(); 
   
-  // Attempt migration first so data isn't lost
   await migrateFromLocalStorage();
   
   await loadOffline();
