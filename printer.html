@@ -1,1 +1,765 @@
-ok
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Visual Certificate Printer - 1399x933 Layout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+
+<style>
+    :root {
+        --primary: #4f46e5; --primary-hover: #4338ca;
+        --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --muted: #64748b;
+        --border: #e2e8f0; --success: #10b981; --warning: #f59e0b;
+    }
+    body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    h2 { color: var(--primary); text-align: center; font-weight: 800; margin-top: 0; font-size: 22px; margin-bottom: 20px;}
+    
+    .card { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid var(--border); }
+    .card-title { font-size: 15px; font-weight: 700; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-bottom: 15px; margin-top: 0; color: #0f172a; }
+    
+    label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+    input[type="text"], textarea, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: 'Montserrat', sans-serif; font-size: 13px; margin-bottom: 15px; box-sizing: border-box; outline: none; }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    
+    .grid-2, .grid-3 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .grid-4 { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media(min-width: 768px) {
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+        .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    }
+
+    button { background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; font-family: 'Montserrat', sans-serif; font-size: 12px;}
+    button:hover { opacity: 0.9; transform: translateY(-1px); }
+    button:disabled { background: #cbd5e1 !important; color: #94a3b8 !important; cursor: not-allowed; transform: none !important;}
+
+    .editor-toolbar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; gap: 8px; flex-wrap: wrap;}
+    .nav-btn { background: #1e293b; width: auto; flex: 1; min-width: 80px;}
+    .dl-btn { background: var(--success); width: auto; flex: 1.5; min-width: 120px;}
+    .dl-all-btn { background: var(--warning); width: auto; flex: 1.5; min-width: 120px;}
+
+    #editorWrapper {
+        width: 100%; 
+        background: #cbd5e1; 
+        border-radius: 5px; 
+        overflow: hidden; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        border: 1px solid #94a3b8;
+        position: relative;
+    }
+
+    #editorContainer {
+        width: 1399px; 
+        height: 933px; 
+        position: relative; 
+        background: #fff;
+        transform-origin: top left;
+    }
+    
+    #placeholderText { color: #94a3b8; font-weight: bold; font-size: 40px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;}
+    
+    #templateImg { width: 1399px; height: 933px; position: absolute; top:0; left:0; pointer-events: none; opacity: 0; transition: 0.3s; }
+    
+    .draggable {
+        position: absolute; cursor: grab; box-sizing: border-box; 
+        user-select: none; z-index: 10; border: 4px dashed transparent;
+    }
+    .draggable.selected { border-color: var(--primary); background: rgba(79, 70, 229, 0.05); z-index: 20; }
+    .draggable:active { cursor: grabbing; }
+    
+    #dragName, #dragTeacher { text-align: center; display: inline-block; white-space: nowrap; line-height: 1; }
+    #dragText { line-height: 1.6; text-align: justify; }
+    #dragSignature { white-space: nowrap; line-height: 1; text-align: center; }
+
+    .controls-panel { background: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid var(--primary); margin-top: 15px; display: none; }
+    .control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 11px; font-weight: 700; width: 100%; gap: 10px;}
+    .control-row select { margin-bottom: 0; padding: 8px; font-size: 12px; flex:1; }
+    .control-row input[type="range"] { flex: 1; margin: 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>TOP STUDENTS PRINTER</h2></h2>
+
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 5px;">
+            <h3 class="card-title" style="margin: 0; border: none;">1. Live Editor & Download</h3>
+            <div style="display: flex; gap: 5px;">
+                <button id="btnUndo" onclick="undo()" style="background: #64748b; width: auto; padding: 6px 12px;" disabled>↩️ Undo</button>
+                <button id="btnRedo" onclick="redo()" style="background: #64748b; width: auto; padding: 6px 12px;" disabled>↪️ Redo</button>
+                <button onclick="exportLayoutData()" style="background: #8b5cf6; width: auto; padding: 6px 12px;">📋 Copy Layout</button>
+                <button onclick="resetLayout()" style="background: #ef4444; width: auto; padding: 6px 12px;">🔄 Reset</button>
+            </div>
+        </div>
+        
+        <div class="editor-toolbar">
+            <button class="nav-btn" id="btnPrev" onclick="prevStudent()" title="Keyboard: Left Arrow" disabled>⬅️ Prev</button>
+            <span id="studentCounter" style="font-size: 14px; font-weight: bold; color: var(--primary);">0 / 0</span>
+            <button class="nav-btn" id="btnNext" onclick="nextStudent()" title="Keyboard: Right Arrow" disabled>Next ➡️</button>
+            <button class="dl-btn" onclick="downloadCurrent()">⬇️ DL Current</button>
+            <button class="dl-all-btn" onclick="downloadAll()">⬇️ Batch DL ALL</button>
+        </div>
+
+        <div id="editorWrapper">
+            <div id="editorContainer">
+                <div id="placeholderText">Loading Background...</div>
+                <img id="templateImg" src="" crossorigin="anonymous">
+                
+                <div id="dragName" class="draggable selected">KAYLIX ZACHI</div>
+                <div id="dragText" class="draggable">Sample outstanding performance text goes here.</div>
+                <div id="dragSignature" class="draggable">Kaylix Zachi</div>
+                <div id="dragTeacher" class="draggable"></div>
+            </div>
+        </div>
+
+        <div class="controls-panel" id="panel-name" style="display: block;">
+            <label style="color:var(--primary); font-size:14px; margin-bottom:10px;">✎ Editing: STUDENT NAME</label>
+            <div class="control-row">
+                <span>Font:</span>
+                <select id="c_nameFont" onchange="applyStyles(); saveStateToHistory();">
+                    <option value="'Playfair Display', serif">Playfair (Elegant)</option>
+                    <option value="'Great Vibes', cursive">Great Vibes (Cursive)</option>
+                    <option value="'Montserrat', sans-serif">Montserrat (Modern)</option>
+                    <option value="'Roboto', sans-serif" selected>Roboto (Clean)</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <span>Scale Zoom:</span>
+                <input type="range" id="c_nameSize" min="10" max="300" step="1" value="90" oninput="applyStyles()" onchange="saveStateToHistory()">
+                <span id="v_nameSize" style="width:40px; text-align:right;">90%</span>
+            </div>
+            <div class="control-row">
+                <span>Color:</span>
+                <input type="color" id="c_nameColor" value="#ef4444" style="width:100%; height:35px; border:none; padding:0;" oninput="applyStyles()" onchange="saveStateToHistory()">
+            </div>
+        </div>
+
+        <div class="controls-panel" id="panel-text">
+            <label style="color:var(--primary); font-size:14px; margin-bottom:10px;">✎ Editing: PARAGRAPH TEXT</label>
+            <div class="control-row">
+                <span>Font:</span>
+                <select id="c_textFont" onchange="applyStyles(); saveStateToHistory();">
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                    <option value="'Roboto', sans-serif" selected>Roboto</option>
+                    <option value="'Playfair Display', serif">Playfair</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <span>Scale Zoom:</span>
+                <input type="range" id="c_textSize" min="10" max="300" step="1" value="93" oninput="applyStyles()" onchange="saveStateToHistory()">
+                <span id="v_textSize" style="width:40px; text-align:right;">93%</span>
+            </div>
+            <div class="control-row">
+                <span>Width:</span>
+                <input type="range" id="c_textWidth" min="10" max="150" step="1" value="66" oninput="applyStyles()" onchange="saveStateToHistory()">
+                <span id="v_textWidth" style="width:40px; text-align:right;">66%</span>
+            </div>
+        </div>
+
+        <div class="controls-panel" id="panel-teacher">
+            <label style="color:var(--primary); font-size:14px; margin-bottom:10px;">✎ Editing: TEACHER TEXT</label>
+            <div class="control-row">
+                <span>Font:</span>
+                <select id="c_teacherFont" onchange="applyStyles(); saveStateToHistory();">
+                    <option value="'Playfair Display', serif" selected>Playfair</option>
+                    <option value="'Montserrat', sans-serif">Montserrat</option>
+                    <option value="'Roboto', sans-serif">Roboto</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <span>Scale Zoom:</span>
+                <input type="range" id="c_teacherSize" min="10" max="300" step="1" value="100" oninput="applyStyles()" onchange="saveStateToHistory()">
+                <span id="v_teacherSize" style="width:40px; text-align:right;">100%</span>
+            </div>
+        </div>
+
+        <div class="controls-panel" id="panel-signature">
+            <label style="color:var(--primary); font-size:14px; margin-bottom:10px;">✎ Editing: SIGNATURE</label>
+            <div class="control-row">
+                <span>Font:</span>
+                <select id="c_signatureFont" onchange="applyStyles(); saveStateToHistory();">
+                    <option value="'Great Vibes', cursive" selected>Great Vibes</option>
+                    <option value="'Dancing Script', cursive">Dancing Script</option>
+                    <option value="'Parisienne', cursive">Parisienne</option>
+                    <option value="'Playfair Display', serif">Playfair</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <span>Scale Zoom:</span>
+                <input type="range" id="c_signatureSize" min="10" max="300" step="1" value="32" oninput="applyStyles()" onchange="saveStateToHistory()">
+                <span id="v_signatureSize" style="width:40px; text-align:right;">32%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 class="card-title">2. Configuration & Student List</h3>
+        
+        <div class="grid-4">
+            <div><label>Subject</label><input type="text" id="g_subject" value="Science" oninput="renderCurrentStudent(); saveStateToHistory();"></div>
+            <div><label>Season Name</label><input type="text" id="g_season" value="10th" oninput="renderCurrentStudent(); saveStateToHistory();"></div>
+            <div><label>Date Given</label><input type="text" id="g_date" value="16th day of February 2026" oninput="renderCurrentStudent(); saveStateToHistory();"></div>
+            <div><label>Season Duration</label><input type="text" id="g_duration" value="February, 2026 – February 16, 2026" oninput="renderCurrentStudent(); saveStateToHistory();"></div>
+        </div>
+
+        <div class="grid-3">
+            <div><label>Teacher Name</label><input type="text" id="g_teacher" value="KAYLIX ZACHI" oninput="updateStaticText(); saveStateToHistory();"></div>
+            <div><label>Teacher Role</label><input type="text" id="g_teacher_role" value="KSGC TEACHER " oninput="updateStaticText(); saveStateToHistory();"></div>
+            <div><label>Signature Text</label><input type="text" id="g_signature" value="Kaylix" oninput="updateStaticText(); saveStateToHistory();"></div>
+        </div>
+        <br>
+        <label>Student List (Format: 1. Name - Grade)</label>
+        <textarea id="b_list" style="height:150px; font-family: monospace;" placeholder="1. KAYLIX ZACHI - 90" oninput="parseStudentList(); saveStateToHistory();">1. KAYLIX ZACHI - 90</textarea>
+    </div>
+</div>
+
+<script>
+    const DB_NAME = "CertGenDB_HTMLtoImage";
+    const STORE_NAME = "certData";
+    let db;
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 1);
+            request.onupgradeneeded = (e) => {
+                db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            request.onsuccess = (e) => { db = e.target.result; resolve(); };
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    function saveToDB(key, value) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readwrite");
+            const store = tx.objectStore(STORE_NAME);
+            store.put(value, key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    function loadFromDB(key) {
+        return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, "readonly");
+            const store = tx.objectStore(STORE_NAME);
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (e) => reject(e.target.error);
+        });
+    }
+
+    // BAGO: Pinalitan natin ito ng bago mong raw github link
+    const DEFAULT_BG_URL = "https://raw.githubusercontent.com/kaylixzachi77/ksgc2/main/achievement.jpg";
+
+    let studentsList = []; 
+    let currentStudentIndex = 0;
+    let activeElement = 'name';
+    let historyStack = [];
+    let historyIndex = -1;
+    let currentWorkspaceScale = 1;
+
+    // BAGO: Updated fallback layout na eksaktong galing sa bigay mong JSON
+    const FALLBACK_LAYOUT = {
+        "inputs": {
+            "season": "10th",
+            "date": "16th day of February 2026",
+            "duration": "February, 2026 – February 16, 2026",
+            "teacher": "KAYLIX ZACHI",
+            "teacher_role": "KSGC TEACHER ",
+            "signature": "Kaylix",
+            "list": "1. KAYLIX ZACHI - 90",
+            "subject": "Science"
+        },
+        "name": {
+            "top": "431px",
+            "left": "427px",
+            "font": "'Roboto', sans-serif",
+            "scale": "90",
+            "color": "#ef4444"
+        },
+        "text": {
+            "top": "550px",
+            "left": "239px",
+            "font": "'Roboto', sans-serif",
+            "scale": "93",
+            "width": "66"
+        },
+        "teacher": {
+            "top": "761px",
+            "left": "239px",
+            "font": "'Playfair Display', serif",
+            "scale": "100"
+        },
+        "signature": {
+            "top": "737px",
+            "left": "301px",
+            "font": "'Great Vibes', cursive",
+            "scale": "32"
+        }
+    };
+
+    const els = {
+        name: document.getElementById('dragName'),
+        text: document.getElementById('dragText'),
+        teacher: document.getElementById('dragTeacher'),
+        signature: document.getElementById('dragSignature')
+    };
+
+    const baseSizes = {
+        name: 65,       
+        text: 25,       
+        teacher: 29,    
+        teacherRole: 18,
+        signature: 65
+    };
+
+    function resizeWorkspace() {
+        const wrapper = document.getElementById('editorWrapper');
+        const container = document.getElementById('editorContainer');
+        currentWorkspaceScale = wrapper.clientWidth / 1399;
+        container.style.transform = `scale(${currentWorkspaceScale})`;
+        wrapper.style.height = (933 * currentWorkspaceScale) + 'px';
+    }
+    window.addEventListener('resize', resizeWorkspace);
+
+    Object.keys(els).forEach(k => {
+        els[k].style.transform = "none";
+        els[k].style.lineHeight = "1";
+    });
+
+    async function loadGoogleFonts() {
+        const fontUrl = "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700;900&family=Great+Vibes&family=Dancing+Script:wght@700&family=Parisienne&family=Roboto:wght@500;700&display=swap";
+        try {
+            const response = await fetch(fontUrl);
+            const css = await response.text();
+            const style = document.createElement('style');
+            style.textContent = css;
+            document.head.appendChild(style);
+        } catch (e) {
+            console.error("Font loading error:", e);
+        }
+    }
+
+    window.onload = async function() {
+        await initDB(); 
+        await loadGoogleFonts(); 
+
+        resizeWorkspace(); 
+        loadBackgroundImage();
+        
+        try {
+            const saved = await loadFromDB("certGenSetupData");
+            if(saved) { loadState(saved); } else { loadState(FALLBACK_LAYOUT); }
+        } catch(e) {
+            loadState(FALLBACK_LAYOUT);
+        }
+
+        parseStudentList();
+        updateStaticText();
+        
+        setTimeout(() => { 
+            applyStyles(); 
+            saveStateToHistory(true); 
+        }, 500);
+    };
+
+    async function loadBackgroundImage() {
+        try {
+            const cachedBg = await loadFromDB("certGenBgCache");
+            if (cachedBg) { applyBgImage(cachedBg); return; }
+        } catch(e) {}
+
+        fetch(DEFAULT_BG_URL).then(res => res.blob()).then(blob => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                saveToDB("certGenBgCache", reader.result).catch(e => {});
+                applyBgImage(reader.result);
+            }
+            reader.readAsDataURL(blob);
+        }).catch(() => applyBgImage(DEFAULT_BG_URL));
+    }
+
+    function applyBgImage(src) {
+        const img = document.getElementById('templateImg');
+        img.crossOrigin = "Anonymous";
+        img.src = src;
+        img.onload = () => {
+            img.style.opacity = "1"; 
+            document.getElementById('placeholderText').style.display = "none";
+        }
+    }
+
+    function parseStudentList() {
+        const raw = document.getElementById('b_list').value;
+        const oldList = [...studentsList]; 
+        studentsList = [];
+        const regex = /^(?:\d+\.\s*)?(.+?)\s*-\s*([\d.]+)/;
+        const lines = raw.split('\n');
+
+        for (let line of lines) {
+            line = line.trim(); if(!line) continue;
+            const match = line.match(regex);
+            if (match) {
+                const name = match[1].trim(); 
+                const grade = parseFloat(match[2].trim());
+                if (grade >= 90) { 
+                    studentsList.push({ name, grade }); 
+                }
+            }
+        }
+        
+        if (currentStudentIndex >= studentsList.length) currentStudentIndex = Math.max(0, studentsList.length - 1);
+        renderCurrentStudent();
+    }
+
+    function renderCurrentStudent() {
+        const counter = document.getElementById('studentCounter');
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+
+        const season = document.getElementById('g_season').value;
+        const date = document.getElementById('g_date').value;
+        const duration = document.getElementById('g_duration').value;
+        const subject = document.getElementById('g_subject').value; // BAGO: Kinukuha natin ang dynamic subject
+
+        els.name.style.display = "block";
+        els.name.style.textAlign = "center";
+        els.name.style.whiteSpace = "nowrap";
+
+        const renderBox = (text) => `
+            <div id="innerNameText" style="display: inline-block; line-height: 1.1; margin: 0;">
+                ${text}
+            </div>
+        `;
+
+        if (studentsList.length === 0) {
+            counter.innerText = "0 / 0";
+            btnPrev.disabled = true; btnNext.disabled = true;
+            els.name.innerHTML = renderBox("KAYLIX ZACHI");
+            els.text.innerText = `In recognition of her outstanding performance that got 100% in ${subject}, having an average of 91%. Given this ${date}, during the ${season} End Season Ceremony held at the Online Facebook Group Chat. (Season Duration: ${duration}).`;
+            applyStyles();
+            return;
+        }
+        
+        btnPrev.disabled = currentStudentIndex === 0;
+        btnNext.disabled = currentStudentIndex === studentsList.length - 1;
+        counter.innerText = `${currentStudentIndex + 1} / ${studentsList.length}`;
+        
+        const student = studentsList[currentStudentIndex];
+        els.name.innerHTML = renderBox(student.name.toUpperCase());
+        
+        // BAGO: In-inject ang ${subject} para mag-bago depende sa naka-type sa UI
+        els.text.innerText = `In recognition of her outstanding performance that got 100% in ${subject}, having an average of ${student.grade}%. Given this ${date}, during the ${season} End Season Ceremony held at the Online Facebook Group Chat. (Season Duration: ${duration}).`;
+
+        applyStyles();
+    }
+
+    function prevStudent() { if (currentStudentIndex > 0) { currentStudentIndex--; renderCurrentStudent(); } }
+    function nextStudent() { if (currentStudentIndex < studentsList.length - 1) { currentStudentIndex++; renderCurrentStudent(); } }
+    
+    function updateStaticText() {
+        const tName = document.getElementById('g_teacher').value.toUpperCase();
+        const tRole = document.getElementById('g_teacher_role').value.toUpperCase();
+        
+        els.teacher.style.display = "block";
+        els.teacher.style.textAlign = "center";
+        els.teacher.style.whiteSpace = "nowrap";
+
+        els.teacher.innerHTML = `
+            <div style="display: inline-block; text-align: center;">
+                <div id="innerTeacherName" style="display: inline-block; line-height: 1.1; margin: 0;">
+                    ${tName}
+                </div>
+                <div id="innerTeacherRole" style="display: block; font-family: 'Montserrat', sans-serif; font-weight: 700; line-height: 1; margin: 0;">
+                    ${tRole}
+                </div>
+            </div>
+        `;
+        els.signature.innerText = document.getElementById('g_signature').value;
+        applyStyles();
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowRight' && !document.getElementById('btnNext').disabled) nextStudent();
+        else if (e.key === 'ArrowLeft' && !document.getElementById('btnPrev').disabled) prevStudent();
+    });
+
+    function selectElement(type) {
+        activeElement = type;
+        Object.keys(els).forEach(k => {
+            els[k].classList.remove('selected');
+            const panel = document.getElementById('panel-'+k);
+            if(panel) panel.style.display = "none";
+        });
+        els[type].classList.add('selected');
+        const activePanel = document.getElementById('panel-'+type);
+        if(activePanel) activePanel.style.display = "block";
+    }
+
+    function makeDraggable(el, type) {
+        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+        const dragStart = (e) => {
+            selectElement(type); 
+            if (e.type === 'touchstart') { pos3 = e.touches[0].clientX; pos4 = e.touches[0].clientY; }
+            else { e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY; }
+            document.onmouseup = dragEnd; document.ontouchend = dragEnd;
+            document.onmousemove = drag; document.ontouchmove = drag;
+        };
+        const drag = (e) => {
+            let clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            let clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            pos1 = (pos3 - clientX) / currentWorkspaceScale; 
+            pos2 = (pos4 - clientY) / currentWorkspaceScale; 
+            pos3 = clientX; 
+            pos4 = clientY;
+            
+            el.style.top = Math.round(el.offsetTop - pos2) + "px"; 
+            el.style.left = Math.round(el.offsetLeft - pos1) + "px";
+        };
+        const dragEnd = () => { 
+            document.onmouseup = null; document.onmousemove = null; document.ontouchend = null; document.ontouchmove = null; 
+            saveStateToHistory(); 
+        };
+        el.onmousedown = dragStart; el.ontouchstart = dragStart;
+    }
+    Object.keys(els).forEach(k => makeDraggable(els[k], k));
+
+    function applyStyles() {
+        const nScale = document.getElementById('c_nameSize').value / 100;
+        const nSizePx = Math.round(baseSizes.name * nScale); 
+        
+        els.name.style.fontSize = nSizePx + "px"; 
+        els.name.style.color = document.getElementById('c_nameColor').value; 
+        els.name.style.fontFamily = document.getElementById('c_nameFont').value;
+
+        const innerNameText = document.getElementById('innerNameText');
+        if(innerNameText) {
+            innerNameText.style.borderBottom = Math.max(2, Math.round(nSizePx * 0.08)) + "px solid currentColor";
+            innerNameText.style.paddingBottom = Math.round(nSizePx * 0.15) + "px";
+        }
+
+        const tScale = document.getElementById('c_textSize').value / 100;
+        const tWidth = document.getElementById('c_textWidth').value;
+        els.text.style.fontSize = Math.round(baseSizes.text * tScale) + "px"; 
+        els.text.style.width = Math.round(1399 * (tWidth / 100)) + "px"; 
+        els.text.style.fontFamily = document.getElementById('c_textFont').value;
+
+        const tcScale = document.getElementById('c_teacherSize').value / 100;
+        const tcSizePx = Math.round(baseSizes.teacher * tcScale);
+        els.teacher.style.fontFamily = document.getElementById('c_teacherFont').value;
+
+        const innerTeacherName = document.getElementById('innerTeacherName');
+        const innerTeacherRole = document.getElementById('innerTeacherRole');
+        
+        if(innerTeacherName && innerTeacherRole) {
+            innerTeacherName.style.fontSize = tcSizePx + "px";
+            innerTeacherName.style.borderBottom = Math.max(2, Math.round(tcSizePx * 0.08)) + "px solid #1e293b";
+            innerTeacherName.style.paddingBottom = Math.round(tcSizePx * 0.15) + "px";
+            
+            const roleSizePx = Math.round(baseSizes.teacherRole * tcScale);
+            innerTeacherRole.style.fontSize = roleSizePx + "px";
+            innerTeacherRole.style.paddingTop = Math.round(roleSizePx * 0.25) + "px"; 
+        }
+
+        const sScale = document.getElementById('c_signatureSize').value / 100;
+        els.signature.style.fontSize = Math.round(baseSizes.signature * sScale) + "px"; 
+        els.signature.style.fontFamily = document.getElementById('c_signatureFont').value;
+        
+        document.getElementById('v_nameSize').textContent = Math.round(nScale * 100) + "%";
+        document.getElementById('v_textSize').textContent = Math.round(tScale * 100) + "%";
+        document.getElementById('v_textWidth').textContent = tWidth + "%";
+        document.getElementById('v_teacherSize').textContent = Math.round(tcScale * 100) + "%";
+        document.getElementById('v_signatureSize').textContent = Math.round(sScale * 100) + "%";
+    }
+
+    function getCurrentState() {
+        return {
+            inputs: { 
+                subject: document.getElementById('g_subject').value,
+                season: document.getElementById('g_season').value, 
+                date: document.getElementById('g_date').value, 
+                duration: document.getElementById('g_duration').value, 
+                teacher: document.getElementById('g_teacher').value, 
+                teacher_role: document.getElementById('g_teacher_role').value, 
+                signature: document.getElementById('g_signature').value, 
+                list: document.getElementById('b_list').value 
+            },
+            name: { top: els.name.style.top, left: els.name.style.left, font: document.getElementById('c_nameFont').value, scale: document.getElementById('c_nameSize').value, color: document.getElementById('c_nameColor').value },
+            text: { top: els.text.style.top, left: els.text.style.left, font: document.getElementById('c_textFont').value, scale: document.getElementById('c_textSize').value, width: document.getElementById('c_textWidth').value },
+            teacher: { top: els.teacher.style.top, left: els.teacher.style.left, font: document.getElementById('c_teacherFont').value, scale: document.getElementById('c_teacherSize').value },
+            signature: { top: els.signature.style.top, left: els.signature.style.left, font: document.getElementById('c_signatureFont').value, scale: document.getElementById('c_signatureSize').value }
+        };
+    }
+
+    function saveStateToHistory(isInit = false) {
+        const state = getCurrentState();
+        if (!isInit && historyIndex < historyStack.length - 1) { historyStack = historyStack.slice(0, historyIndex + 1); }
+        if (historyStack.length > 0 && JSON.stringify(state) === JSON.stringify(historyStack[historyIndex])) return;
+        historyStack.push(state);
+        historyIndex++;
+        document.getElementById('btnUndo').disabled = historyIndex <= 0;
+        document.getElementById('btnRedo').disabled = historyIndex >= historyStack.length - 1;
+        saveToDB("certGenSetupData", state).catch(e => {});
+    }
+
+    function loadState(state) {
+        if(!state) return;
+        if(state.inputs) {
+            document.getElementById('g_subject').value = state.inputs.subject || "Science"; 
+            document.getElementById('g_season').value = state.inputs.season || "10th"; 
+            document.getElementById('g_date').value = state.inputs.date || "16th day of February 2026"; 
+            document.getElementById('g_duration').value = state.inputs.duration || "February, 2026 – February 16, 2026";
+            document.getElementById('g_teacher').value = state.inputs.teacher || "KAYLIX ZACHI"; 
+            document.getElementById('g_teacher_role').value = state.inputs.teacher_role || "KSGC TEACHER "; 
+            document.getElementById('g_signature').value = state.inputs.signature || "Kaylix"; 
+            document.getElementById('b_list').value = state.inputs.list || "1. KAYLIX ZACHI - 90";
+            updateStaticText();
+        }
+        if(state.name) {
+            document.getElementById('c_nameFont').value = state.name.font || "'Roboto', sans-serif"; 
+            document.getElementById('c_nameSize').value = state.name.scale || "90"; 
+            document.getElementById('c_nameColor').value = state.name.color || "#ef4444";
+            if(state.name.top.includes('%')) els.name.style.top = "431px"; else els.name.style.top = state.name.top;
+            if(state.name.left.includes('%')) els.name.style.left = "427px"; else els.name.style.left = state.name.left;
+        }
+        if(state.text) {
+            document.getElementById('c_textFont').value = state.text.font || "'Roboto', sans-serif"; 
+            document.getElementById('c_textSize').value = state.text.scale || "93"; 
+            document.getElementById('c_textWidth').value = state.text.width || "66";
+            if(state.text.top.includes('%')) els.text.style.top = "550px"; else els.text.style.top = state.text.top;
+            if(state.text.left.includes('%')) els.text.style.left = "239px"; else els.text.style.left = state.text.left;
+        }
+        if(state.teacher) { 
+            document.getElementById('c_teacherFont').value = state.teacher.font || "'Playfair Display', serif"; 
+            document.getElementById('c_teacherSize').value = state.teacher.scale || "100"; 
+            if(state.teacher.top.includes('%')) els.teacher.style.top = "761px"; else els.teacher.style.top = state.teacher.top;
+            if(state.teacher.left.includes('%')) els.teacher.style.left = "239px"; else els.teacher.style.left = state.teacher.left;
+        }
+        if(state.signature) { 
+            document.getElementById('c_signatureFont').value = state.signature.font || "'Great Vibes', cursive"; 
+            document.getElementById('c_signatureSize').value = state.signature.scale || "32"; 
+            if(state.signature.top.includes('%')) els.signature.style.top = "737px"; else els.signature.style.top = state.signature.top;
+            if(state.signature.left.includes('%')) els.signature.style.left = "301px"; else els.signature.style.left = state.signature.left;
+        }
+        applyStyles();
+    }
+
+    function undo() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            loadState(historyStack[historyIndex]);
+            document.getElementById('btnUndo').disabled = historyIndex <= 0;
+            document.getElementById('btnRedo').disabled = false;
+            saveToDB("certGenSetupData", historyStack[historyIndex]);
+        }
+    }
+
+    function redo() {
+        if (historyIndex < historyStack.length - 1) {
+            historyIndex++;
+            loadState(historyStack[historyIndex]);
+            document.getElementById('btnUndo').disabled = false;
+            document.getElementById('btnRedo').disabled = historyIndex >= historyStack.length - 1;
+            saveToDB("certGenSetupData", historyStack[historyIndex]);
+        }
+    }
+
+    async function downloadCurrent() {
+        const editorContainer = document.getElementById('editorContainer');
+        Object.keys(els).forEach(k => els[k].classList.remove('selected'));
+        
+        let fileName = studentsList.length > 0 ? `${studentsList[currentStudentIndex].name}_Certificate.jpg` : "Certificate.jpg";
+
+        editorContainer.style.transform = "none";
+        
+        await new Promise(r => setTimeout(r, 150));
+
+        try {
+            const dataUrl = await htmlToImage.toJpeg(editorContainer, { 
+                quality: 1.0,
+                pixelRatio: 1.5,
+                backgroundColor: '#ffffff'
+            });
+            
+            const link = document.createElement('a');
+            link.download = fileName; 
+            link.href = dataUrl; 
+            link.click();
+        } catch (err) { 
+            console.error(err);
+            alert("May nag-error sa pag-save ng image. Paki-tingnan ang console."); 
+        } 
+        finally {
+            resizeWorkspace(); 
+            if (activeElement) { selectElement(activeElement); }
+        }
+    }
+
+    async function downloadAll() {
+        if (studentsList.length === 0) return alert("❌ Walang students sa listahan!");
+        
+        const confirmDL = confirm(`I-do-download ang lahat ng ${studentsList.length} certificates. Sigurado ka ba?`);
+        if(!confirmDL) return;
+
+        const originalIndex = currentStudentIndex;
+        Object.keys(els).forEach(k => els[k].classList.remove('selected'));
+        const editorContainer = document.getElementById('editorContainer');
+
+        editorContainer.style.transform = "none";
+
+        for (let i = 0; i < studentsList.length; i++) {
+            currentStudentIndex = i;
+            renderCurrentStudent(); 
+            await new Promise(r => setTimeout(r, 500)); 
+
+            try {
+                const dataUrl = await htmlToImage.toJpeg(editorContainer, { 
+                    quality: 0.98,
+                    pixelRatio: 1.5,
+                    backgroundColor: '#ffffff'
+                });
+
+                const link = document.createElement('a');
+                link.download = `${studentsList[i].name}_Certificate.jpg`;
+                link.href = dataUrl;
+                link.click();
+            } catch(e) {
+                console.error("Batch download error:", e);
+            }
+            
+            await new Promise(r => setTimeout(r, 600)); 
+        }
+
+        resizeWorkspace();
+        currentStudentIndex = originalIndex;
+        renderCurrentStudent();
+        selectElement(activeElement);
+        alert("✅ Lahat ng Certificates ay nai-download na!");
+    }
+
+    function exportLayoutData() {
+        navigator.clipboard.writeText(JSON.stringify(getCurrentState(), null, 2)).then(() => alert("✅ LAYOUT DATA COPIED!\n\nI-paste ito sa layout.json ng repository mo."));
+    }
+
+    async function resetLayout() { 
+        if(confirm("Ito ay magbubura sa mga na-edit mo at babalik sa Default. Ituloy?")) { 
+            try {
+                const tx = db.transaction(STORE_NAME, "readwrite");
+                tx.objectStore(STORE_NAME).clear();
+                tx.oncomplete = () => location.reload();
+            } catch(e) { location.reload(); }
+        } 
+    }
+</script>
+</body>
+</html>
