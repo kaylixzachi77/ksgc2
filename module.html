@@ -3,194 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KSGC MODULE 2026</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>CLASS MODULE 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #f3f4f6;
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
-            --primary-color: #6366f1; /* Modern Indigo */
-            --primary-hover: #4f46e5;
+            --primary-color: #0f172a; 
+            --primary-hover: #1e293b;
+            --secondary-color: #3b82f6; 
             --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
-            --success-color: #10b981;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #059669;
+            --app-max-width: 480px; 
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            background-color: #e5e7eb; 
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Mobile App Container */
+        .app-container {
+            width: 100%;
+            max-width: var(--app-max-width);
+            background-color: var(--bg-color);
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow-x: hidden;
         }
 
         .header {
             text-align: center;
-            padding: 2.5rem 1rem 1.5rem;
-            width: 100%;
+            padding: 2rem 1.5rem 1rem;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .header h1 {
-            font-size: 2.2rem;
-            color: var(--text-main);
-            margin: 0 0 0.5rem 0;
-        }
-
-        .header p {
-            color: var(--text-muted);
+            font-family: 'Arial Black', 'Inter', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary-color);
             margin: 0;
+            letter-spacing: 0.02em;
         }
 
         /* Tabs Navigation */
-        .tabs-container {
-            width: 100%;
-            max-width: 800px;
-            padding: 0 1rem;
-            margin-bottom: 1.5rem;
+        .tabs-wrapper {
+            background: var(--card-bg);
+            padding: 1rem 1rem 0;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .tabs {
             display: flex;
             gap: 0.5rem;
             overflow-x: auto;
-            padding-bottom: 0.5rem;
-            scrollbar-width: thin;
+            padding-bottom: 1rem;
+            scrollbar-width: none; 
         }
 
         .tabs::-webkit-scrollbar {
-            height: 6px;
-        }
-        .tabs::-webkit-scrollbar-thumb {
-            background-color: #cbd5e1;
-            border-radius: 10px;
+            display: none; 
         }
 
         .tab-btn {
-            background-color: var(--card-bg);
+            background-color: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
-            padding: 0.6rem 1.2rem;
-            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
         .tab-btn:hover {
-            border-color: var(--primary-color);
             color: var(--primary-color);
+            border-color: var(--text-muted);
         }
 
         .tab-btn.active {
             background-color: var(--primary-color);
             color: white;
             border-color: var(--primary-color);
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
         }
 
         /* Slider Area */
         .slider-wrapper {
             width: 100%;
-            max-width: 800px;
-            overflow: hidden; /* Hides slides outside the container */
-            padding: 0 1rem;
-            box-sizing: border-box;
+            overflow: hidden;
             flex-grow: 1;
+            background-color: var(--bg-color);
         }
 
         .slider-track {
             display: flex;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             width: 100%;
+            height: 100%;
         }
 
         .slide {
             min-width: 100%;
             box-sizing: border-box;
-            padding-right: 1rem; /* Spacing between slides visually */
-        }
-
-        .subject-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-            border: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
             height: 100%;
+            overflow-y: auto;
         }
 
+        /* Typography & Layout inside slides */
         .subject-title {
             font-size: 1.5rem;
-            font-weight: 700;
             color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f3f4f6;
+            margin: 0 0 1.5rem 0;
         }
 
         .item-row {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1.2rem;
-            padding: 1rem;
-            background: #f8fafc;
-            border-radius: 10px;
-            gap: 1.5rem;
-            transition: background 0.2s;
+            flex-direction: column;
+            margin-bottom: 1rem;
+            padding: 1.2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            gap: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        .item-row:hover {
-            background: #f1f5f9;
+        .topic-row {
+            background: #f0f9ff;
+            border-color: #bae6fd;
         }
 
         .item-content {
-            flex-grow: 1;
+            width: 100%;
         }
 
         .item-label {
             font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 700;
-            color: var(--primary-color);
+            color: var(--text-muted);
             display: block;
             margin-bottom: 0.4rem;
         }
 
+        .topic-row .item-label {
+            color: var(--secondary-color);
+        }
+
         .text-to-copy {
             color: var(--text-main);
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.5;
+            display: block;
         }
 
         .copy-btn {
-            background-color: transparent;
+            background-color: var(--bg-color);
             color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            white-space: nowrap;
+            width: 100%;
+            text-align: center;
         }
 
         .copy-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
+            background-color: var(--border-color);
         }
 
         .copy-btn.copied {
@@ -199,283 +195,484 @@
             color: white;
         }
 
-        @media (max-width: 600px) {
-            .subject-card { padding: 1.5rem; }
-            .item-row {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            .copy-btn {
-                width: 100%;
-                text-align: center;
-            }
-            .slide { padding-right: 0; }
+        /* Lesson Content */
+        .lesson-content {
+            user-select: text;
+            -webkit-user-select: text;
+            margin: 1.5rem 0;
+            color: var(--text-main);
+            line-height: 1.6;
+            font-size: 0.95rem;
         }
+
+        .lesson-content h3 {
+            font-size: 1rem;
+            color: var(--primary-color);
+            margin: 1.5rem 0 0.5rem 0;
+            font-weight: normal; /* Normal kasi bold na yung mismong special characters */
+        }
+
+        .lesson-content p, .lesson-content ul, .lesson-content ol {
+            margin: 0 0 1rem 0;
+        }
+
+        .lesson-content ul, .lesson-content ol {
+            padding-left: 1.2rem;
+        }
+
+        .lesson-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 2rem 0;
+            border: none;
+        }
+
+        .tasks-header {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>✨ KSGC MODULE 2026</h1>
-        <p>Complete Course Requirements</p>
-    </div>
-
-    <div class="tabs-container">
-        <div class="tabs" id="tab-list">
-            <button class="tab-btn active" onclick="goToSlide(0)">Self</button>
-            <button class="tab-btn" onclick="goToSlide(1)">Debate</button>
-            <button class="tab-btn" onclick="goToSlide(2)">Math</button>
-            <button class="tab-btn" onclick="goToSlide(3)">Roleplay</button>
-            <button class="tab-btn" onclick="goToSlide(4)">Research</button>
-            <button class="tab-btn" onclick="goToSlide(5)">Reading</button>
-            <button class="tab-btn" onclick="goToSlide(6)">Technology</button>
-            <button class="tab-btn" onclick="goToSlide(7)">Creativity</button>
+    <div class="app-container">
+        
+        <div class="header">
+            <h1>𝗖𝗟𝗔𝗦𝗦 𝗠𝗢𝗗𝗨𝗟𝗘 𝟮𝟬𝟮𝟲</h1>
         </div>
-    </div>
 
-    <div class="slider-wrapper">
-        <div class="slider-track" id="slider-track">
+        <div class="tabs-wrapper">
+            <div class="tabs" id="tab-list">
+                <button class="tab-btn active" onclick="goToSlide(0)">Proper Self</button>
+                <button class="tab-btn" onclick="goToSlide(1)">Debate</button>
+                <button class="tab-btn" onclick="goToSlide(2)">Math</button>
+                <button class="tab-btn" onclick="goToSlide(3)">Roleplay</button>
+                <button class="tab-btn" onclick="goToSlide(4)">Research</button>
+                <button class="tab-btn" onclick="goToSlide(5)">Reading</button>
+                <button class="tab-btn" onclick="goToSlide(6)">Technology</button>
+                <button class="tab-btn" onclick="goToSlide(7)">Creativity</button>
+            </div>
+        </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Self</h2>
+        <div class="slider-wrapper">
+            <div class="slider-track" id="slider-track">
+
+                <div class="slide">
+                    <h2 class="subject-title">𝗣𝗿𝗼𝗽𝗲𝗿 𝗦𝗲𝗹𝗳</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">Proper Self Introduction and Parts</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Proper self-introduction is the act of presenting yourself to others in a complete and organized way. It helps people understand who you are and builds confidence.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗦𝗲𝗹𝗳 𝗜𝗻𝘁𝗿𝗼𝗱𝘂𝗰𝘁𝗶𝗼𝗻:</h3>
+                        <ul>
+                            <li><strong>𝗚𝗿𝗲𝗲𝘁𝗶𝗻𝗴:</strong> A polite way to start your introduction.</li>
+                            <li><strong>𝗡𝗮𝗺𝗲:</strong> Stating your full name.</li>
+                            <li><strong>𝗜𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻:</strong> Basic details about yourself (age, school, or course).</li>
+                            <li><strong>𝗧𝗿𝗮𝗶𝘁𝘀:</strong> Personality or characteristics (e.g., hardworking, friendly).</li>
+                            <li><strong>𝗛𝗼𝗯𝗯𝗶𝗲𝘀:</strong> Activities you enjoy doing.</li>
+                            <li><strong>𝗦𝗸𝗶𝗹𝗹𝘀:</strong> Talents or abilities you have.</li>
+                            <li><strong>𝗚𝗼𝗮𝗹𝘀:</strong> Your plans or dreams for the future.</li>
+                            <li><strong>𝗖𝗹𝗼𝘀𝗶𝗻𝗴:</strong> Ending politely, often with thanks.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲:</h3>
+                        <p>"Hello! I’m Juan. I am hardworking and creative. I enjoy drawing and playing games. My skill is using technology. My goal is to become a successful entrepreneur. Thank you!"</p>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Each student will introduce themselves using the parts of self-introduction: (Greeting, Name, Info, Traits, Hobbies, Skills, Goals, Closing).</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Interview a classmate by asking their name, personality, hobbies, strengths, and goals, and write down your answers.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Debate</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗗𝗲𝗯𝗮𝘁𝗲</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">How to Debate</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Debate is a formal discussion where people present their opinions with reasons and evidence. It teaches critical thinking, persuasion, and public speaking.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗮 𝗗𝗲𝗯𝗮𝘁𝗲:</h3>
+                        <ul>
+                            <li><strong>𝗧𝗼𝗽𝗶𝗰:</strong> The issue being discussed.</li>
+                            <li><strong>𝗣𝗼𝘀𝗶𝘁𝗶𝘃𝗲 𝗦𝗶𝗱𝗲:</strong> Supporting the topic.</li>
+                            <li><strong>𝗡𝗲𝗴𝗮𝘁𝗶𝘃𝗲 𝗦𝗶𝗱𝗲:</strong> Opposing the topic.</li>
+                            <li><strong>𝗔𝗿𝗴𝘂𝗺𝗲𝗻𝘁𝘀:</strong> Reasons for your side.</li>
+                            <li><strong>𝗖𝗼𝘂𝗻𝘁𝗲𝗿𝗮𝗿𝗴𝘂𝗺𝗲𝗻𝘁𝘀:</strong> Responding to the opposing side’s points.</li>
+                            <li><strong>𝗖𝗼𝗻𝗰𝗹𝘂𝘀𝗶𝗼𝗻:</strong> Final summary of your points.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲 𝗧𝗼𝗽𝗶𝗰:</h3>
+                        <p>"Should students use mobile phones in school?"<br>
+                        - <strong>𝗣𝗼𝘀𝗶𝘁𝗶𝘃𝗲 𝗦𝗶𝗱𝗲:</strong> "Mobile phones help students access information quickly."<br>
+                        - <strong>𝗡𝗲𝗴𝗮𝘁𝗶𝘃𝗲 𝗦𝗶𝗱𝗲:</strong> "Mobile phones distract students from learning."</p>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Teacher finds a topic and divides the class into two groups. Group 1: Negative Side | Group 2: Positive Side. Students will start a debate.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Search a trending topic and write arguments with evidence.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Math</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗠𝗮𝘁𝗵</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">Why Operations are Important</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Math operations are methods used to solve numerical problems. They are essential for everyday calculations, problem-solving, and logical thinking.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗠𝗮𝘁𝗵 𝗢𝗽𝗲𝗿𝗮𝘁𝗶𝗼𝗻𝘀:</h3>
+                        <ul>
+                            <li><strong>𝗔𝗱𝗱𝗶𝘁𝗶𝗼𝗻:</strong> Combining numbers to get a total.</li>
+                            <li><strong>𝗦𝘂𝗯𝘁𝗿𝗮𝗰𝘁𝗶𝗼𝗻:</strong> Finding the difference between numbers.</li>
+                            <li><strong>𝗠𝘂𝗹𝘁𝗶𝗽𝗹𝗶𝗰𝗮𝘁𝗶𝗼𝗻:</strong> Repeated addition to calculate totals faster.</li>
+                            <li><strong>𝗗𝗶𝘃𝗶𝘀𝗶𝗼𝗻:</strong> Splitting numbers into equal groups.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲 𝗣𝗿𝗼𝗯𝗹𝗲𝗺𝘀:</h3>
+                        <ul>
+                            <li>1000 − 419 = 581</li>
+                            <li>1200 + 2973 = 4173</li>
+                            <li>5555 ÷ 55 = 101</li>
+                            <li>6676 × 2733 = 18,236,508</li>
+                        </ul>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Solve 1000 − 419 and 1200 + 2973 with solution. Write in paper and take a photo.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Solve 5555 ÷ 55 and 6676 × 2733 with solution. Write in paper and take a photo.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Roleplay</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗥𝗼𝗹𝗲𝗽𝗹𝗮𝘆</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">How to Create Roleplay and Script</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Roleplay is acting out situations to practice communication, teamwork, and problem-solving. Scripts guide the dialogue and actions of each character.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗥𝗼𝗹𝗲𝗽𝗹𝗮𝘆:</h3>
+                        <ul>
+                            <li><strong>𝗦𝗰𝗲𝗻𝗮𝗿𝗶𝗼:</strong> The situation or problem being acted out.</li>
+                            <li><strong>𝗖𝗵𝗮𝗿𝗮𝗰𝘁𝗲𝗿𝘀:</strong> The people in the scenario.</li>
+                            <li><strong>𝗗𝗶𝗮𝗹𝗼𝗴𝘂𝗲:</strong> What each character says.</li>
+                            <li><strong>𝗣𝗹𝗼𝘁 / 𝗙𝗹𝗼𝘄:</strong> The order of events from start to finish.</li>
+                            <li><strong>𝗖𝗼𝗻𝗰𝗹𝘂𝘀𝗶𝗼𝗻:</strong> How the scenario ends.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲:</h3>
+                        <p><strong>𝗦𝗰𝗲𝗻𝗮𝗿𝗶𝗼:</strong> Working on a group project.<br>
+                        - <strong>𝗖𝗵𝗮𝗿𝗮𝗰𝘁𝗲𝗿 𝗔:</strong> "We need to finish this project before class ends."<br>
+                        - <strong>𝗖𝗵𝗮𝗿𝗮𝗰𝘁𝗲𝗿 𝗕:</strong> "Let’s divide tasks so everyone can help."<br>
+                        - <strong>𝗖𝗵𝗮𝗿𝗮𝗰𝘁𝗲𝗿 𝗖:</strong> "I’ll do research; you prepare the presentation."</p>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Teacher divides the class into two groups and present a roleplay in group chat.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Create a creative roleplay script.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Research</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗥𝗲𝘀𝗲𝗮𝗿𝗰𝗵</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">How to Create a Research Title</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>A research title is the main focus of a study. It shows what the research is about and guides the entire study.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗮 𝗥𝗲𝘀𝗲𝗮𝗿𝗰𝗵 𝗧𝗶𝘁𝗹𝗲:</h3>
+                        <ul>
+                            <li><strong>𝗠𝗮𝗶𝗻 𝗧𝗼𝗽𝗶𝗰:</strong> The central subject of the research.</li>
+                            <li><strong>𝗦𝗰𝗼𝗽𝗲:</strong> What the research will cover.</li>
+                            <li><strong>𝗞𝗲𝘆𝘄𝗼𝗿𝗱𝘀:</strong> Important words that define the study.</li>
+                            <li><strong>𝗖𝗹𝗮𝗿𝗶𝘁𝘆:</strong> Making the title understandable and concise.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲𝘀:</h3>
+                        <ol>
+                            <li>"The Effect of Mobile Phones on Students’ Study Habits"</li>
+                            <li>"How Social Media Influences Teen Creativity"</li>
+                            <li>"The Role of School Clubs in Developing Leadership Skills"</li>
+                        </ol>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Students will create 3 possible research titles about school or student life.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Choose the best title and explain why it is a good research title.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Reading</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗥𝗲𝗮𝗱𝗶𝗻𝗴</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">Reading Comprehension</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Reading comprehension is the ability to understand, analyze, and explain a text or story. It helps students identify main ideas, supporting details, and lessons.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗥𝗲𝗮𝗱𝗶𝗻𝗴 𝗖𝗼𝗺𝗽𝗿𝗲𝗵𝗲𝗻𝘀𝗶𝗼𝗻:</h3>
+                        <ul>
+                            <li><strong>𝗠𝗮𝗶𝗻 𝗜𝗱𝗲𝗮:</strong> The central point of the text.</li>
+                            <li><strong>𝗦𝘂𝗽𝗽𝗼𝗿𝘁𝗶𝗻𝗴 𝗗𝗲𝘁𝗮𝗶𝗹𝘀:</strong> Facts or statements that explain the main idea.</li>
+                            <li><strong>𝗦𝗲𝗾𝘂𝗲𝗻𝗰𝗲 / 𝗢𝗿𝗱𝗲𝗿:</strong> How events happen in order.</li>
+                            <li><strong>𝗜𝗻𝗳𝗲𝗿𝗲𝗻𝗰𝗲:</strong> Understanding hidden or implied meanings.</li>
+                            <li><strong>𝗟𝗲𝘀𝘀𝗼𝗻 / 𝗠𝗼𝗿𝗮𝗹:</strong> The message or learning from the story.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲:</h3>
+                        <p><strong>𝗦𝘁𝗼𝗿𝘆:</strong> A boy learns honesty after trying to cheat.<br>
+                        - <strong>𝗠𝗮𝗶𝗻 𝗜𝗱𝗲𝗮:</strong> Honesty is better than cheating.<br>
+                        - <strong>𝗟𝗲𝘀𝘀𝗼𝗻:</strong> Being honest builds trust and respect.</p>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Teacher will send a short story. Students must read it and answer 5 questions.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Write a short summary of the story and explain the lesson.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Technology</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗧𝗲𝗰𝗵𝗻𝗼𝗹𝗼𝗴𝘆</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">Basic Internet Safety</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Internet safety is how to protect yourself and your personal information online. It prevents identity theft, cyberbullying, and other risks.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗜𝗻𝘁𝗲𝗿𝗻𝗲𝘁 𝗦𝗮𝗳𝗲𝘁𝘆:</h3>
+                        <ul>
+                            <li><strong>𝗣𝗮𝘀𝘀𝘄𝗼𝗿𝗱𝘀:</strong> Using strong, secure passwords.</li>
+                            <li><strong>𝗣𝗲𝗿𝘀𝗼𝗻𝗮𝗹 𝗜𝗻𝗳𝗼𝗿𝗺𝗮𝘁𝗶𝗼𝗻:</strong> Keeping your details private.</li>
+                            <li><strong>𝗦𝘂𝘀𝗽𝗶𝗰𝗶𝗼𝘂𝘀 𝗟𝗶𝗻𝗸𝘀:</strong> Avoiding unsafe websites or messages.</li>
+                            <li><strong>𝗣𝗿𝗶𝘃𝗮𝗰𝘆 𝗦𝗲𝘁𝘁𝗶𝗻𝗴𝘀:</strong> Adjusting social media or app settings.</li>
+                            <li><strong>𝗦𝗮𝗳𝗲 𝗣𝗿𝗮𝗰𝘁𝗶𝗰𝗲𝘀:</strong> Logging out and verifying sources.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲:</h3>
+                        <ul>
+                            <li>Always create strong passwords</li>
+                            <li>Do not share your personal address or contact info</li>
+                            <li>Avoid clicking unknown links</li>
+                            <li>Adjust your social media privacy settings</li>
+                            <li>Log out of shared devices</li>
+                        </ul>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Students will list 5 ways to stay safe on the internet and sent in the page.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Explain why protecting passwords and personal information is important.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="slide">
-                <div class="subject-card">
-                    <h2 class="subject-title">Creativity</h2>
+                <div class="slide">
+                    <h2 class="subject-title">𝗖𝗿𝗲𝗮𝘁𝗶𝘃𝗶𝘁𝘆</h2>
                     
-                    <div class="item-row">
+                    <div class="item-row topic-row">
                         <div class="item-content">
-                            <span class="item-label">Topic</span>
+                            <span class="item-label">𝗧𝗼𝗽𝗶𝗰</span>
                             <span class="text-to-copy">Creative Thinking</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
+                    
+                    <div class="lesson-content">
+                        <h3>𝗧𝗼𝗽𝗶𝗰 𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</h3>
+                        <p>Creative thinking is using imagination and original ideas to solve problems or express oneself. It allows students to plan goals and create innovative solutions.</p>
+                        
+                        <h3>𝗣𝗮𝗿𝘁𝘀 𝗼𝗳 𝗖𝗿𝗲𝗮𝘁𝗶𝘃𝗲 𝗧𝗵𝗶𝗻𝗸𝗶𝗻𝗴:</h3>
+                        <ul>
+                            <li><strong>𝗜𝗱𝗲𝗮 𝗚𝗲𝗻𝗲𝗿𝗮𝘁𝗶𝗼𝗻:</strong> Coming up with new concepts.</li>
+                            <li><strong>𝗣𝗹𝗮𝗻𝗻𝗶𝗻𝗴:</strong> Organizing your thoughts.</li>
+                            <li><strong>𝗩𝗶𝘀𝘂𝗮𝗹𝗶𝘇𝗮𝘁𝗶𝗼𝗻:</strong> Representing ideas through drawing, writing, or other forms.</li>
+                            <li><strong>𝗘𝘅𝗽𝗿𝗲𝘀𝘀𝗶𝗼𝗻:</strong> Showing ideas creatively.</li>
+                            <li><strong>𝗘𝘃𝗮𝗹𝘂𝗮𝘁𝗶𝗼𝗻:</strong> Reviewing and improving your ideas.</li>
+                        </ul>
+
+                        <h3>𝗘𝘅𝗮𝗺𝗽𝗹𝗲:</h3>
+                        <p>Drawing a building representing your dream business.<br>
+                        - <strong>𝗘𝘅𝗽𝗹𝗮𝗻𝗮𝘁𝗶𝗼𝗻:</strong> Shows creativity, imagination, and determination to reach goals.</p>
+                    </div>
+
+                    <hr class="divider">
+                    <div class="tasks-header">𝗧𝗮𝘀𝗸𝘀</div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Activity</span>
+                            <span class="item-label">𝗔𝗰𝘁𝗶𝘃𝗶𝘁𝘆</span>
                             <span class="text-to-copy">Students will draw something that represents their dream or future.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
 
                     <div class="item-row">
                         <div class="item-content">
-                            <span class="item-label">Exam</span>
+                            <span class="item-label">𝗘𝘅𝗮𝗺</span>
                             <span class="text-to-copy">Explain the meaning of your drawing in 3–5 sentences.</span>
                         </div>
-                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                        <button class="copy-btn" onclick="copyWithLabel(this)">Copy</button>
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
     </div>
 
@@ -483,24 +680,28 @@
         // SLIDER AND TABS LOGIC
         const track = document.getElementById('slider-track');
         const tabs = document.querySelectorAll('.tab-btn');
+        const slides = document.querySelectorAll('.slide');
 
         function goToSlide(index) {
-            // Update slider position
             track.style.transform = `translateX(-${index * 100}%)`;
 
-            // Update active state on tabs
             tabs.forEach(tab => tab.classList.remove('active'));
             tabs[index].classList.add('active');
             
-            // Auto scroll the tab bar if tab is out of view (especially for mobile)
             tabs[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            
+            // Scroll internal card back to top when switching tabs
+            slides[index].scrollTop = 0;
         }
 
-        // COPY BUTTON LOGIC
-        function copyContent(btnElement) {
+        // COPY WITH LABEL LOGIC
+        function copyWithLabel(btnElement) {
             const row = btnElement.closest('.item-row');
+            const labelElement = row.querySelector('.item-label');
             const textElement = row.querySelector('.text-to-copy');
-            const textToCopy = textElement.textContent;
+            
+            // This combines the stylized label with the actual text
+            const textToCopy = labelElement.textContent + ": " + textElement.textContent;
 
             navigator.clipboard.writeText(textToCopy).then(() => {
                 const originalText = btnElement.innerText;
