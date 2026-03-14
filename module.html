@@ -1,1 +1,521 @@
-yy
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KSGC MODULE 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-color: #6366f1; /* Modern Indigo */
+            --primary-hover: #4f46e5;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2.5rem 1rem 1.5rem;
+            width: 100%;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            color: var(--text-main);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Tabs Navigation */
+        .tabs-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scrollbar-width: thin;
+        }
+
+        .tabs::-webkit-scrollbar {
+            height: 6px;
+        }
+        .tabs::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Slider Area */
+        .slider-wrapper {
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden; /* Hides slides outside the container */
+            padding: 0 1rem;
+            box-sizing: border-box;
+            flex-grow: 1;
+        }
+
+        .slider-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            width: 100%;
+        }
+
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            padding-right: 1rem; /* Spacing between slides visually */
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid var(--border-color);
+            height: 100%;
+        }
+
+        .subject-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.2rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            gap: 1.5rem;
+            transition: background 0.2s;
+        }
+
+        .item-row:hover {
+            background: #f1f5f9;
+        }
+
+        .item-content {
+            flex-grow: 1;
+        }
+
+        .item-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.4rem;
+        }
+
+        .text-to-copy {
+            color: var(--text-main);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .copy-btn.copied {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        @media (max-width: 600px) {
+            .subject-card { padding: 1.5rem; }
+            .item-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .copy-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .slide { padding-right: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>✨ KSGC MODULE 2026</h1>
+        <p>Complete Course Requirements</p>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs" id="tab-list">
+            <button class="tab-btn active" onclick="goToSlide(0)">Self</button>
+            <button class="tab-btn" onclick="goToSlide(1)">Debate</button>
+            <button class="tab-btn" onclick="goToSlide(2)">Math</button>
+            <button class="tab-btn" onclick="goToSlide(3)">Roleplay</button>
+            <button class="tab-btn" onclick="goToSlide(4)">Research</button>
+            <button class="tab-btn" onclick="goToSlide(5)">Reading</button>
+            <button class="tab-btn" onclick="goToSlide(6)">Technology</button>
+            <button class="tab-btn" onclick="goToSlide(7)">Creativity</button>
+        </div>
+    </div>
+
+    <div class="slider-wrapper">
+        <div class="slider-track" id="slider-track">
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Self</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">Proper Self Introduction and Parts</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Each student will introduce themselves using the parts of self-introduction: (Greeting, Name, Info, Traits, Hobbies, Skills, Goals, Closing).</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Interview a classmate by asking their name, personality, hobbies, strengths, and goals, and write down your answers.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Debate</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">How to Debate</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Teacher finds a topic and divides the class into two groups. Group 1: Negative Side | Group 2: Positive Side. Students will start a debate.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Search a trending topic and write arguments with evidence.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Math</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">Why Operations are Important</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Solve 1000 − 419 and 1200 + 2973 with solution. Write in paper and take a photo.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Solve 5555 ÷ 55 and 6676 × 2733 with solution. Write in paper and take a photo.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Roleplay</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">How to Create Roleplay and Script</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Teacher divides the class into two groups and present a roleplay in group chat.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Create a creative roleplay script.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Research</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">How to Create a Research Title</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Students will create 3 possible research titles about school or student life.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Choose the best title and explain why it is a good research title.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Reading</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">Reading Comprehension</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Teacher will send a short story. Students must read it and answer 5 questions.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Write a short summary of the story and explain the lesson.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Technology</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">Basic Internet Safety</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Students will list 5 ways to stay safe on the internet and sent in the page.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Explain why protecting passwords and personal information is important.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="slide">
+                <div class="subject-card">
+                    <h2 class="subject-title">Creativity</h2>
+                    
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Topic</span>
+                            <span class="text-to-copy">Creative Thinking</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Activity</span>
+                            <span class="text-to-copy">Students will draw something that represents their dream or future.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+
+                    <div class="item-row">
+                        <div class="item-content">
+                            <span class="item-label">Exam</span>
+                            <span class="text-to-copy">Explain the meaning of your drawing in 3–5 sentences.</span>
+                        </div>
+                        <button class="copy-btn" onclick="copyContent(this)">Copy</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // SLIDER AND TABS LOGIC
+        const track = document.getElementById('slider-track');
+        const tabs = document.querySelectorAll('.tab-btn');
+
+        function goToSlide(index) {
+            // Update slider position
+            track.style.transform = `translateX(-${index * 100}%)`;
+
+            // Update active state on tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabs[index].classList.add('active');
+            
+            // Auto scroll the tab bar if tab is out of view (especially for mobile)
+            tabs[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+
+        // COPY BUTTON LOGIC
+        function copyContent(btnElement) {
+            const row = btnElement.closest('.item-row');
+            const textElement = row.querySelector('.text-to-copy');
+            const textToCopy = textElement.textContent;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'Copied!';
+                btnElement.classList.add('copied');
+
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                btnElement.innerText = 'Error';
+            });
+        }
+    </script>
+</body>
+</html>
