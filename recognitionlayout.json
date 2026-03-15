@@ -1,0 +1,53 @@
+{
+  "mode": "student",
+  "inputs": {
+    "season": "9th",
+    "date": "16th day of February 2026",
+    "duration": "February 12–16, 2026",
+    "teacher": "Jasper  Simbahon ",
+    "teacher_role": "KSGC PRINCIPAL",
+    "signature": "jasper",
+    "list": ""
+  },
+  "name": {
+    "top": "429px",
+    "left": "656px",
+    "font": "'Roboto', sans-serif",
+    "weight": "900",
+    "scale": "101",
+    "color": "#ff0000"
+  },
+  "text": {
+    "top": "532px",
+    "left": "654px",
+    "font": "'Roboto', sans-serif",
+    "badge": "#ec4899",
+    "scale": "108",
+    "width": "52"
+  },
+  "grades": {
+    "top": "442px",
+    "left": "39px",
+    "scale": "88",
+    "color": "#1e293b",
+    "width": "14",
+    "hidden": false
+  },
+  "teacher": {
+    "top": "824px",
+    "left": "84px",
+    "font": "'Playfair Display', serif",
+    "scale": "86"
+  },
+  "signature": {
+    "top": "783px",
+    "left": "208px",
+    "font": "'Great Vibes', cursive",
+    "scale": "52"
+  },
+  "pic": {
+    "top": "416px",
+    "left": "292px",
+    "scale": "161"
+  }
+}
