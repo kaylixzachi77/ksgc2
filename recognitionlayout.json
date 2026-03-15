@@ -3,51 +3,51 @@
   "inputs": {
     "season": "9th",
     "date": "16th day of February 2026",
-    "duration": "February 12–16, 2026",
+    "duration": "February 12 - March 16, 2026",
     "teacher": "Jasper  Simbahon ",
-    "teacher_role": "KSGC PRINCIPAL",
+    "teacher_role": "KSGC ADVISER",
     "signature": "jasper",
-    "list": ""
+    "subjects": "Math, Research, Proper Self, Roleplay, Reading, Debate, Technology, Creativity",
+    "list": "1. Jasper Simbahon - 90"
   },
   "name": {
-    "top": "429px",
-    "left": "656px",
+    "top": "439px",
+    "left": "428px",
     "font": "'Roboto', sans-serif",
     "weight": "900",
-    "scale": "101",
+    "scale": "97",
     "color": "#ff0000"
   },
   "text": {
-    "top": "532px",
-    "left": "654px",
+    "top": "541px",
+    "left": "436px",
     "font": "'Roboto', sans-serif",
     "badge": "#ec4899",
-    "scale": "108",
-    "width": "52"
+    "scale": "79",
+    "width": "60"
   },
-  "grades": {
-    "top": "442px",
-    "left": "39px",
-    "scale": "88",
-    "color": "#1e293b",
-    "width": "14",
-    "hidden": false
+  "footer": {
+    "top": "856px",
+    "left": "407px",
+    "scale": "83",
+    "width": "41"
   },
   "teacher": {
-    "top": "824px",
-    "left": "84px",
+    "top": "865px",
+    "left": "104px",
     "font": "'Playfair Display', serif",
-    "scale": "86"
+    "scale": "73"
   },
   "signature": {
-    "top": "783px",
-    "left": "208px",
+    "top": "824px",
+    "left": "194px",
     "font": "'Great Vibes', cursive",
     "scale": "52"
   },
   "pic": {
-    "top": "416px",
-    "left": "292px",
-    "scale": "161"
+    "top": "432px",
+    "left": "76px",
+    "scale": "164",
+    "border": "23"
   }
 }
