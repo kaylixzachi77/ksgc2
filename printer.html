@@ -150,7 +150,7 @@
 </div>
 
 <div class="container">
-    <h2>🏆 Pro Visual Cert Printer</h2>
+    <h2> TOP PRINTER </h2>
 
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 5px;">
@@ -795,21 +795,7 @@
         }
     }
 
-    // --- BAGO: Helper function para sa Data URL to Blob Conversion ---
-    function dataURLToBlob(dataURL) {
-        const parts = dataURL.split(';base64,');
-        const contentType = parts[0].split(':')[1];
-        const raw = window.atob(parts[1]);
-        const rawLength = raw.length;
-        const uInt8Array = new Uint8Array(rawLength);
-        
-        for (let i = 0; i < rawLength; ++i) {
-            uInt8Array[i] = raw.charCodeAt(i);
-        }
-        return new Blob([uInt8Array], { type: contentType });
-    }
-    // ----------------------------------------------------------------
-
+    // BAGO: Gumagamit ng Loading Overlay para hindi makita ang DOM movement!
     async function downloadCurrent() {
         const editorContainer = document.getElementById('editorContainer');
         const overlay = document.getElementById('loadingOverlay');
@@ -818,11 +804,12 @@
         
         let fileName = studentsList.length > 0 ? `${studentsList[currentStudentIndex].name}_Certificate.jpg` : "Certificate.jpg";
 
+        // Show loading screen BEFORE moving anything
         overlay.style.display = 'flex';
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise(r => setTimeout(r, 100)); // allow UI to update
 
         editorContainer.style.transform = "none";
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 150)); // let layout settle
 
         try {
             const dataUrl = await htmlToImage.toJpeg(editorContainer, { 
@@ -833,19 +820,10 @@
                 allowTaint: true
             });
             
-            // --- BAGO: Blob Conversion Implementation ---
-            const blob = dataURLToBlob(dataUrl);
-            const blobUrl = URL.createObjectURL(blob);
-            
             const link = document.createElement('a');
             link.download = fileName; 
-            link.href = blobUrl; 
+            link.href = dataUrl; 
             link.click();
-            
-            // Clean up para maka-save sa memory
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-            // --------------------------------------------
-
         } catch (err) { 
             console.error(err);
             alert("May nag-error sa pag-save ng image. Paki-tingnan ang console."); 
@@ -853,6 +831,7 @@
         finally {
             resizeWorkspace(); 
             if (activeElement) { selectElement(activeElement); }
+            // Itago na ang loading screen
             overlay.style.display = 'none';
         }
     }
@@ -888,18 +867,10 @@
                     allowTaint: true
                 });
 
-                // --- BAGO: Blob Conversion Implementation ---
-                const blob = dataURLToBlob(dataUrl);
-                const blobUrl = URL.createObjectURL(blob);
-
                 const link = document.createElement('a');
                 link.download = `${studentsList[i].name}_Certificate.jpg`;
-                link.href = blobUrl;
+                link.href = dataUrl;
                 link.click();
-                
-                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                // --------------------------------------------
-
             } catch(e) {
                 console.error("Batch download error:", e);
             }
