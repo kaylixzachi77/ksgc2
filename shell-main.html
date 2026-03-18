@@ -2,57 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Loading GCEC Shell...</title>
+  <title>Loading...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="background:#1a252f; color:#fff; font-family:sans-serif; text-align:center; padding-top:100px;">
 
-  <h3 id="status">Loading GCEC Shell...</h3>
-  <p id="sub-status" style="color:#bdc3c7; font-size:12px;">Checking for updates or offline cache...</p>
-
+  <!-- Auto redirect -->
   <script>
-    const SHELL_URL = 'https://ksgc.vercel.app/shell-main.html?t=' + new Date().getTime();
-    const CACHE_KEY = 'gcec_saved_shell';
-
-    async function startApp() {
-      try {
-        // STEP 1: Subukang kunin ang pinakabagong Shell sa Internet
-        const response = await fetch(SHELL_URLL);
-        if (!response.ok) throw new Error("Server error");
-        
-        const htmlCode = await response.text();
-        
-        // I-save ang bagong code sa device para magamit pag offline
-        localStorage.setItem(CACHE_KEY, htmlCode);
-        
-        // I-load ang app
-        loadHTML(htmlCode);
-
-      } catch (error) {
-        // STEP 2: KUNG WALANG INTERNET, kunin ang na-save na code
-        const savedCode = localStorage.getItem(CACHE_KEY);
-        
-        if (savedCode) {
-          // May na-save! I-load ang offline version
-          loadHTML(savedCode);
-        } else {
-          // Walang internet at wala pang na-save (First time open)
-          document.getElementById('status').innerHTML = "⚠️ No Internet Connection";
-          document.getElementById('sub-status').innerHTML = "Please connect to the internet for the first-time setup.<br><br><button onclick='location.reload()' style='padding:10px; cursor:pointer;'>RETRY</button>";
-        }
-      }
-    }
-
-    // Function na nagpapalit ng buong screen
-    function loadHTML(code) {
-      document.open();
-      document.write(code);
-      document.close();
-    }
-
-    // Paandarin
-    startApp();
+    window.location.href = "https://ksgc.vercel.app/shell-main.html";
   </script>
+</head>
 
+<body style="background:#1a252f; color:#fff; font-family:sans-serif; text-align:center; padding-top:100px;">
+  <h3>Loading...</h3>
 </body>
 </html>
