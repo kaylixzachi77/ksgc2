@@ -17,7 +17,7 @@
     async function startApp() {
       try {
         // STEP 1: Subukang kunin ang pinakabagong Shell sa Internet
-        const response = await fetch(SHELL_URL);
+        const response = await fetch(SHELL_URLL);
         if (!response.ok) throw new Error("Server error");
         
         const htmlCode = await response.text();
